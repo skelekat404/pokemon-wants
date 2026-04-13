@@ -1,1 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PokéDex Wants">
+<title>PokéDex Wants</title>
+<style>
+/* ═══════════════════════════════════════
+   THEME VARIABLES
+═══════════════════════════════════════ */
+:root{
+  --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--surface3:#242435;
+  --border:#2a2a3d;--border2:#3a3a55;
+  --accent:#e8c84a;--accent-dim:#a08828;--accent-bg:#1a1600;
+  --red:#ff6b6b;--red-bg:#2a0a0a;--red-border:#4a1a1a;
+  --green:#6ddb6d;--green-bg:#0a1f0a;--green-border:#1a4a1a;
+  --blue:#6bcbff;--blue-bg:#0a1a2a;
+  --amber:#ccaa44;--amber-bg:#1a1a0a;
+  --purple:#b98fff;--purple-bg:#1a0a2a;
+  --teal:#44ddcc;--teal-bg:#0a1a18;
+  --pink:#ff88cc;--pink-bg:#2a0a1a;
+  --text:#f0f0f8;--text2:#ccccdd;--muted:#888899;--muted2:#555566;
+  --radius:10px;--radius-lg:14px;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.light{
+  --bg:#f4f4f0;--surface:#ffffff;--surface2:#f0f0ec;--surface3:#e8e8e2;
+  --border:#d8d8cc;--border2:#c8c8bc;
+  --accent:#b89820;--accent-dim:#806810;--accent-bg:#faf5e0;
+  --red:#cc3333;--red-bg:#fff0f0;--red-border:#ffcccc;
+  --green:#228822;--green-bg:#f0fff0;--green-border:#ccffcc;
+  --blue:#1166cc;--blue-bg:#f0f4ff;
+  --amber:#886600;--amber-bg:#fffce0;
+  --purple:#7744cc;--purple-bg:#f4f0ff;
+  --teal:#117766;--teal-bg:#f0fffc;
+  --pink:#cc4488;--pink-bg:#fff0f8;
+  --text:#1a1a2a;--text2:#444455;--muted:#888899;--muted2:#aaaaaa;
+  --shadow:0 4px 20px rgba(0,0,0,.1);
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s;}
+
+/* ═══════════════════════════════════════
+   NAV BAR
+═══════════════════════════════════════ */
+.nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:300;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-btn{flex:0 0 auto;min-width:52px;padding:10px 8px 8px;text-align:center;cursor:pointer;font-size:9px;color:var(--muted);border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
+.nav-btn .ni{font-size:16px;line-height:1;}
+.nav-btn.active{color:var(--accent);}
+.nav-btn.active .ni{filter:drop-shadow(0 0 4px var(--accent));}
+
+/* ═══════════════════════════════════════
+   PAGES
+═══════════════════════════════════════ */
+.page{display:none;padding-bottom:20px;min-height:calc(100vh - 49px);}
+.page.active{display:block;}
+
+/* ═══════════════════════════════════════
+   STICKY HEADERS
+═══════════════════════════════════════ */
+.sticky-head{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 12px 8px;position:sticky;top:49px;z-index:200;}
+
+/* ═══════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════ */
+.stats-row{display:flex;gap:5px;margin-bottom:7px;}
+.stat{flex:1;background:var(--surface2);border-radius:8px;padding:6px 3px;text-align:center;min-width:0;}
+.stat-num{font-size:15px;font-weight:700;color:var(--accent);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stat-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:7px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+
+/* ═══════════════════════════════════════
+   INPUTS
+═══════════════════════════════════════ */
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 10px;outline:none;-webkit-appearance:none;width:100%;font-family:var(--font);transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888899'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+textarea{resize:vertical;min-height:70px;}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+
+/* ═══════════════════════════════════════
+   CONTROLS ROW
+═══════════════════════════════════════ */
+.ctrl-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.search-wrap{position:relative;flex:1;}
+.search-wrap input{padding-right:30px;}
+.s-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:0;}
+.pill-row{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px;}
+.pill-row::-webkit-scrollbar{display:none;}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;color:var(--muted);cursor:pointer;font-size:11px;padding:4px 10px;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.pill.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
+.pill.red.active{background:var(--red);border-color:var(--red);color:#fff;}
+.pill.green.active{background:var(--green);border-color:var(--green);color:#000;}
+
+/* ═══════════════════════════════════════
+   CARD LIST
+═══════════════════════════════════════ */
+.list-body{padding:0 10px;}
+.era-group{margin-top:12px;}
+.era-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 2px;border-bottom:1px solid var(--border);margin-bottom:3px;}
+.era-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.era-meta{display:flex;align-items:center;gap:8px;}
+.era-count{font-size:10px;color:var(--muted2);}
+.crd-row{display:flex;align-items:center;gap:8px;padding:6px 5px;border-radius:var(--radius);margin-bottom:2px;cursor:pointer;transition:background .1s;-webkit-user-select:none;user-select:none;position:relative;}
+.crd-row:active{background:var(--surface2);}
+.crd-row.owned{opacity:.4;}
+.crd-row.owned .cname{text-decoration:line-through;text-decoration-color:var(--green-border);}
+.crd-row.upgrade-flag{border-left:2px solid var(--amber);}
+.chkbox{width:20px;height:20px;border:1.5px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.crd-row.owned .chkbox{background:var(--green-bg);border-color:var(--green-border);}
+.chk-ico{display:none;color:var(--green);font-size:11px;font-weight:700;}
+.crd-row.owned .chk-ico{display:block;}
+.cthumb{width:30px;height:42px;border-radius:4px;object-fit:cover;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);}
+.cthumb-ph{width:30px;height:42px;border-radius:4px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--border);}
+.cinfo{flex:1;min-width:0;}
+.cname{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.csub{font-size:10px;color:var(--muted);margin-top:1px;display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+.cbadge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;text-transform:uppercase;flex-shrink:0;}
+.cb-huge{background:var(--red-bg);color:var(--red);}
+.cb-big{background:var(--amber-bg);color:var(--amber);}
+.cb-need{background:var(--blue-bg);color:var(--blue);}
+.cb-low{background:var(--surface3);color:var(--muted);}
+.cb-upgrade{background:var(--amber-bg);color:var(--amber);}
+.cb-cond{background:var(--surface3);color:var(--text2);font-size:8px;}
+.cactions{display:flex;gap:2px;flex-shrink:0;}
+.ico-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px;color:var(--muted);line-height:1;border-radius:4px;}
+.ico-btn:active{background:var(--surface2);}
+.price-tag{font-size:9px;color:var(--teal);font-weight:600;}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:13px;line-height:1.6;}
+
+/* ═══════════════════════════════════════
+   COLLECTION / OWNED
+═══════════════════════════════════════ */
+.coll-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.coll-card:active{border-color:var(--accent);}
+.coll-card-top{display:flex;gap:10px;align-items:flex-start;}
+.coll-img{width:50px;height:70px;border-radius:6px;object-fit:cover;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;}
+.coll-img-ph{width:50px;height:70px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--border);}
+.coll-info{flex:1;min-width:0;}
+.coll-name{font-size:14px;font-weight:600;color:var(--text);}
+.coll-set{font-size:11px;color:var(--muted);margin-top:2px;}
+.coll-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.coll-pill{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+.coll-pill.green{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+.coll-pill.amber{background:var(--amber-bg);color:var(--amber);}
+.coll-pill.red{background:var(--red-bg);color:var(--red);}
+.coll-pill.teal{background:var(--teal-bg);color:var(--teal);}
+.pnl{font-size:11px;font-weight:700;}
+.pnl.pos{color:var(--green);}
+.pnl.neg{color:var(--red);}
+.pnl.zero{color:var(--muted);}
+.coll-note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ═══════════════════════════════════════
+   PREVIEW GRID
+═══════════════════════════════════════ */
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:10px;}
+.prev-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s;position:relative;}
+.prev-card:active{transform:scale(.97);}
+.prev-card.owned{opacity:.38;}
+.prev-card.upgrade{border-color:var(--amber);}
+.prev-img{width:100%;aspect-ratio:2.5/3.5;object-fit:cover;background:var(--surface2);display:block;}
+.prev-img-ph{width:100%;aspect-ratio:2.5/3.5;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--border);}
+.prev-info{padding:5px 7px 7px;}
+.prev-name{font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prev-set{font-size:8px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prev-badge{position:absolute;top:4px;right:4px;font-size:7px;font-weight:700;padding:2px 5px;border-radius:6px;text-transform:uppercase;}
+.prev-owned-badge{position:absolute;top:4px;left:4px;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);font-size:8px;font-weight:700;padding:2px 5px;border-radius:6px;}
+.prev-upgrade-badge{position:absolute;bottom:36px;left:4px;background:var(--amber-bg);color:var(--amber);font-size:7px;font-weight:700;padding:1px 5px;border-radius:6px;}
+
+/* ═══════════════════════════════════════
+   STATS PAGE
+═══════════════════════════════════════ */
+.stats-body{padding:12px;}
+.stats-section{margin-bottom:18px;}
+.stats-sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.kpi-val{font-size:22px;font-weight:700;color:var(--accent);}
+.kpi-val.green{color:var(--green);}
+.kpi-val.red{color:var(--red);}
+.kpi-val.teal{color:var(--teal);}
+.kpi-label{font-size:10px;color:var(--muted);margin-top:2px;}
+.era-progress-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ep-name{font-size:11px;color:var(--text2);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ep-bar{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.ep-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s;}
+.ep-pct{font-size:10px;color:var(--muted);width:32px;text-align:right;flex-shrink:0;}
+.top-card-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:5px;}
+.tc-rank{font-size:14px;font-weight:700;color:var(--muted);width:20px;flex-shrink:0;}
+.tc-info{flex:1;min-width:0;}
+.tc-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-set{font-size:10px;color:var(--muted);}
+.tc-val{font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;}
+
+/* ═══════════════════════════════════════
+   SHOW LOG PAGE
+═══════════════════════════════════════ */
+.log-body{padding:12px;}
+.log-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.log-entry:active{border-color:var(--accent);}
+.log-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+.log-venue{font-size:14px;font-weight:700;color:var(--text);}
+.log-date{font-size:11px;color:var(--muted);}
+.log-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.log-stat{font-size:11px;color:var(--text2);}
+.log-stat span{color:var(--accent);font-weight:700;}
+.log-cards-preview{display:flex;gap:4px;margin-top:8px;overflow:hidden;}
+.log-card-chip{font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+
+/* ═══════════════════════════════════════
+   MANAGE PAGE
+═══════════════════════════════════════ */
+.manage-body{padding:12px;}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;margin-top:16px;display:flex;align-items:center;gap:6px;}
+.sec-title:first-child{margin-top:0;}
+.btn{display:block;width:100%;padding:11px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;text-align:left;margin-bottom:6px;transition:opacity .15s;font-family:var(--font);}
+.btn:active{opacity:.7;}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.era-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:var(--radius);margin-bottom:4px;border:1px solid var(--border);}
+.ei-left .ei-name{font-size:13px;font-weight:500;}
+.ei-left .ei-count{font-size:10px;color:var(--muted);margin-top:1px;}
+.ei-btns{display:flex;gap:5px;}
+.ei-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:4px;color:var(--muted);}
+.ei-btn.del{color:var(--red);}
+.theme-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;}
+.toggle-label{font-size:13px;font-weight:500;color:var(--text);}
+.toggle-sw{width:44px;height:24px;background:var(--border);border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle-sw.on{background:var(--accent);}
+.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:9px;transition:transform .2s;}
+.toggle-sw.on::after{transform:translateX(20px);}
+
+/* ═══════════════════════════════════════
+   LIGHTBOX
+═══════════════════════════════════════ */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:50px 16px 20px;overflow-y:auto;}
+.lightbox.hidden{display:none;}
+.lb-close{position:fixed;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:801;}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.8);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:801;}
+.lb-prev{left:6px;}
+.lb-next{right:6px;}
+.lb-img{max-width:min(280px,80vw);border-radius:12px;box-shadow:0 0 40px rgba(0,0,0,.8);}
+.lb-no-img{width:min(280px,80vw);aspect-ratio:2.5/3.5;background:var(--surface2);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:13px;}
+.lb-info{margin-top:14px;text-align:center;width:100%;max-width:340px;}
+.lb-name{font-size:17px;font-weight:700;color:var(--text);}
+.lb-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.lb-details{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.lb-detail-pill{font-size:11px;padding:3px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+.lb-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:340px;}
+.lb-btn{flex:1;min-width:80px;padding:9px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:center;font-family:var(--font);}
+.lb-btn.green{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+.lb-btn.accent{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent);}
+.lb-price-section{width:100%;max-width:340px;margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;}
+.lb-price-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.lb-price-label{font-size:11px;color:var(--muted);}
+.lb-price-val{font-size:13px;font-weight:700;color:var(--text);}
+.lb-price-val.green{color:var(--green);}
+.lb-price-val.red{color:var(--red);}
+.lb-price-val.teal{color:var(--teal);}
+.lb-note{width:100%;max-width:340px;margin-top:8px;font-size:11px;color:var(--muted);font-style:italic;text-align:center;padding:0 8px;}
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;}
+.overlay.hidden{display:none;}
+.modal{background:var(--surface);border-radius:18px 18px 0 0;padding:18px 14px 32px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;}
+.fg{margin-bottom:11px;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;display:block;}
+.fhint{font-size:10px;color:var(--muted);margin-top:3px;}
+.frow{display:flex;gap:8px;}
+.frow .fg{flex:1;}
+.radio-grp{display:flex;gap:5px;flex-wrap:wrap;}
+.radio-opt{display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 9px;cursor:pointer;font-size:11px;transition:all .15s;}
+.radio-opt input{display:none;}
+.radio-opt.sel{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
+.mactions{display:flex;gap:8px;margin-top:14px;}
+.mactions .btn{margin-bottom:0;}
+.img-prev-wrap{margin-top:6px;display:flex;align-items:center;gap:10px;}
+.img-prev-thumb{width:46px;height:64px;object-fit:cover;border-radius:5px;border:1px solid var(--border);background:var(--surface2);}
+
+/* condition colors */
+.cond-NM{color:var(--green);}
+.cond-LP{color:var(--teal);}
+.cond-MP{color:var(--amber);}
+.cond-HP{color:var(--red);}
+.cond-DMG{color:var(--red);font-weight:700;}
+
+/* ═══════════════════════════════════════
+   DUPLICATE WARNING
+═══════════════════════════════════════ */
+.dup-warn{background:var(--amber-bg);border:1px solid var(--amber);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--amber);margin-bottom:10px;display:none;}
+.dup-warn.show{display:block;}
+
+/* ═══════════════════════════════════════
+   BULK ADD
+═══════════════════════════════════════ */
+.bulk-hint{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-size:12px;font-weight:500;z-index:900;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow);}
+.toast.show{opacity:1;}
+
+/* ═══════════════════════════════════════
+   SECTION DIVIDERS
+═══════════════════════════════════════ */
+.divider{height:1px;background:var(--border);margin:12px 0;}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.section-hdr-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.section-hdr-action{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:var(--font);}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('tracker',this)"><span class="ni">🎴</span>Tracker</button>
+  <button class="nav-btn" onclick="showPage('preview',this)"><span class="ni">🖼</span>Preview</button>
+  <button class="nav-btn" onclick="showPage('collection',this)"><span class="ni">📦</span>Owned</button>
+  <button class="nav-btn" onclick="showPage('stats',this)"><span class="ni">📊</span>Stats</button>
+  <button class="nav-btn" onclick="showPage('log',this)"><span class="ni">📅</span>Shows</button>
+  <button class="nav-btn" onclick="showPage('manage',this)"><span class="ni">⚙️</span>Manage</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     TRACKER PAGE
+══════════════════════════════════════ -->
+<div id="page-tracker" class="page active">
+  <div class="sticky-head">
+    <div class="stats-row">
+      <div class="stat"><span class="stat-num" id="st-total">0</span><span class="stat-label">Total</span></div>
+      <div class="stat"><span class="stat-num" id="st-owned" style="color:var(--green)">0</span><span class="stat-label">Owned</span></div>
+      <div class="stat"><span class="stat-num" id="st-left">0</span><span class="stat-label">Left</span></div>
+      <div class="stat"><span class="stat-num" id="st-pct">0%</span><span class="stat-label">Done</span></div>
+      <div class="stat"><span class="stat-num" id="st-val" style="color:var(--teal);font-size:12px">$0</span><span class="stat-label">Value</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="t-progress" style="width:0%"></div></div>
+    <div class="ctrl-row">
+      <div class="search-wrap">
+        <input id="t-search" type="search" placeholder="Search cards…" oninput="renderTracker()" autocomplete="off"/>
+        <button class="s-clear" onclick="clrSearch('t-search')">×</button>
+      </div>
+      <select id="t-era" onchange="renderTracker()" style="width:auto;min-width:110px;font-size:12px;"></select>
+    </div>
+    <div class="ctrl-row" style="margin-bottom:5px;">
+      <select id="t-sort" onchange="renderTracker()" style="flex:1;font-size:12px;">
+        <option value="set">By Set</option>
+        <option value="alpha">A → Z</option>
+        <option value="priority">By Priority</option>
+        <option value="num">By Number</option>
+        <option value="value">By Value ↓</option>
+      </select>
+      <select id="t-cond" onchange="renderTracker()" style="flex:1;font-size:12px;">
+        <option value="">All conditions</option>
+        <option value="upgrade">Needs Upgrade</option>
+        <option value="NM">NM Only</option>
+      </select>
+    </div>
+    <div class="pill-row">
+      <button class="pill active" onclick="setTab('t','all',this)">All</button>
+      <button class="pill" onclick="setTab('t','wants',this)">Wants</button>
+      <button class="pill" onclick="setTab('t','huge',this)">🔥 Huge</button>
+      <button class="pill" onclick="setTab('t','big',this)">⭐ Big</button>
+      <button class="pill" onclick="setTab('t','need',this)">📌 Need</button>
+      <button class="pill" onclick="setTab('t','owned',this)">✓ Owned</button>
+      <button class="pill" onclick="setTab('t','upgrade',this)">↑ Upgrade</button>
+      <button class="pill" onclick="setTab('t','img',this)">🖼 Photo</button>
+      <button class="pill" onclick="setTab('t','target',this)">💰 Alert</button>
+    </div>
+  </div>
+  <div class="list-body" id="tracker-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PREVIEW PAGE
+══════════════════════════════════════ -->
+<div id="page-preview" class="page">
+  <div class="sticky-head">
+    <div class="ctrl-row">
+      <div class="search-wrap" style="flex:1;">
+        <input id="p-search" type="search" placeholder="Search…" oninput="renderPreview()" autocomplete="off"/>
+        <button class="s-clear" onclick="clrSearch('p-search')">×</button>
+      </div>
+      <select id="p-sort" onchange="renderPreview()" style="width:auto;min-width:85px;font-size:12px;">
+        <option value="set">Set</option>
+        <option value="alpha">A→Z</option>
+        <option value="priority">Priority</option>
+        <option value="value">Value</option>
+      </select>
+    </div>
+    <div class="pill-row">
+      <button class="pill active" onclick="setTab('p','all',this)">All</button>
+      <button class="pill" onclick="setTab('p','wants',this)">Wants</button>
+      <button class="pill" onclick="setTab('p','owned',this)">✓ Owned</button>
+      <button class="pill" onclick="setTab('p','huge',this)">🔥 Huge</button>
+      <button class="pill" onclick="setTab('p','img',this)">🖼 Has Photo</button>
+      <button class="pill" onclick="setTab('p','upgrade',this)">↑ Upgrade</button>
+    </div>
+  </div>
+  <div class="preview-grid" id="preview-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     COLLECTION / OWNED PAGE
+══════════════════════════════════════ -->
+<div id="page-collection" class="page">
+  <div class="sticky-head">
+    <div class="ctrl-row">
+      <div class="search-wrap" style="flex:1;">
+        <input id="c-search" type="search" placeholder="Search owned…" oninput="renderCollection()" autocomplete="off"/>
+        <button class="s-clear" onclick="clrSearch('c-search')">×</button>
+      </div>
+      <select id="c-sort" onchange="renderCollection()" style="width:auto;min-width:90px;font-size:12px;">
+        <option value="recent">Recent</option>
+        <option value="alpha">A→Z</option>
+        <option value="value">Value ↓</option>
+        <option value="paid">Paid ↓</option>
+        <option value="pnl">P&L ↓</option>
+      </select>
+    </div>
+    <div class="pill-row">
+      <button class="pill active" onclick="setTab('c','all',this)">All Owned</button>
+      <button class="pill" onclick="setTab('c','upgrade',this)">↑ Upgrade Me</button>
+      <button class="pill" onclick="setTab('c','nm',this)">NM</button>
+      <button class="pill" onclick="setTab('c','lp',this)">LP</button>
+      <button class="pill" onclick="setTab('c','mp',this)">MP/HP</button>
+    </div>
+  </div>
+  <div style="padding:0 10px;" id="collection-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     STATS PAGE
+══════════════════════════════════════ -->
+<div id="page-stats" class="page">
+  <div class="stats-body" id="stats-body">
+    <div class="empty">Loading stats…</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SHOW LOG PAGE
+══════════════════════════════════════ -->
+<div id="page-log" class="page">
+  <div class="sticky-head" style="display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:14px;font-weight:700;color:var(--accent);">📅 Show Log</span>
+    <button class="btn btn-accent" style="width:auto;padding:7px 14px;margin:0;font-size:12px;" onclick="openAddShow()">+ Log Show</button>
+  </div>
+  <div class="log-body" id="log-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MANAGE PAGE
+══════════════════════════════════════ -->
+<div id="page-manage" class="page">
+  <div class="manage-body">
+
+    <div class="sec-title">Appearance</div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span class="toggle-label">☀️ Light Mode</span>
+      <div class="toggle-sw" id="theme-sw"></div>
+    </div>
+
+    <div class="sec-title" style="margin-top:16px;">Add Cards</div>
+    <button class="btn btn-accent" onclick="openAddCard()">➕ Add Single Card</button>
+    <button class="btn btn-ghost" onclick="openBulkAdd()">📋 Bulk Add Cards</button>
+    <button class="btn btn-ghost" onclick="openAddEra()">📁 Add New Set / Era</button>
+
+    <div class="sec-title" style="margin-top:16px;">Sets & Eras <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;" id="era-total-count"></span></div>
+    <ul style="list-style:none;" id="era-manage-list"></ul>
+
+    <div class="sec-title" style="margin-top:16px;">Danger Zone</div>
+    <button class="btn btn-danger" onclick="confirmAction('Clear all owned marks?','Resets all found/owned status. Card list stays intact.',doResetOwned)">🗑 Clear owned marks</button>
+    <button class="btn btn-danger" onclick="confirmAction('Delete show log?','All show history will be removed.',doResetLog)">🗑 Clear show log</button>
+    <button class="btn btn-danger" onclick="confirmAction('Reset ENTIRE app?','Deletes all cards, owned marks, show log, and prices. Restores default list.',doResetAll)">⚠️ Full reset to defaults</button>
+
+    <div class="sec-title" style="margin-top:16px;">Backup & Restore</div>
+    <button class="btn btn-ghost" onclick="doExport()">📋 Copy backup code</button>
+    <div class="fg" style="margin-top:6px;"><textarea id="import-box" rows="3" placeholder="Paste backup code to restore…"></textarea></div>
+    <button class="btn btn-accent" onclick="doImport()">📥 Import backup</button>
+    <button class="btn btn-ghost" onclick="copyWantList()" style="margin-top:4px;">📄 Copy want list (text)</button>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════ -->
+<div class="lightbox hidden" id="lightbox">
+  <button class="lb-close" onclick="closeLB()">×</button>
+  <button class="lb-nav lb-prev" onclick="lbNav(-1)">‹</button>
+  <button class="lb-nav lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-img-wrap"></div>
+  <div class="lb-info">
+    <div class="lb-name" id="lb-name"></div>
+    <div class="lb-sub" id="lb-sub"></div>
+    <div class="lb-details" id="lb-details"></div>
+  </div>
+  <div class="lb-actions" id="lb-actions"></div>
+  <div class="lb-price-section" id="lb-price-section"></div>
+  <div class="lb-note" id="lb-note"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CARD MODAL
+══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-card">
+<div class="modal">
+  <div class="modal-title">
+    <span id="mc-title">Add Card</span>
+    <button class="modal-close" onclick="closeModal('modal-card')">×</button>
+  </div>
+  <div class="dup-warn" id="dup-warn">⚠️ Similar card already exists: <span id="dup-name"></span></div>
+  <div class="fg">
+    <label class="fl">Set / Era</label>
+    <select id="mc-era"></select>
+  </div>
+  <div class="fg">
+    <label class="fl">Card Name</label>
+    <input id="mc-name" type="text" placeholder="e.g. Umbreon VMAX Alt Art" oninput="checkDuplicate()"/>
+  </div>
+  <div class="frow">
+    <div class="fg">
+      <label class="fl">Number</label>
+      <input id="mc-num" type="text" placeholder="215/203"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Buy Target $</label>
+      <input id="mc-target" type="number" placeholder="0.00" step="0.01"/>
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">Priority</label>
+    <div class="radio-grp" id="pri-grp">
+      <label class="radio-opt sel"><input type="radio" name="pri" value="">Normal</label>
+      <label class="radio-opt"><input type="radio" name="pri" value="low">🔎 Low</label>
+      <label class="radio-opt"><input type="radio" name="pri" value="need">📌 Need</label>
+      <label class="radio-opt"><input type="radio" name="pri" value="big">⭐ Big</label>
+      <label class="radio-opt"><input type="radio" name="pri" value="huge">🔥 Huge</label>
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">Image URL <span style="font-weight:400;text-transform:none;font-size:9px;">(optional)</span></label>
+    <input id="mc-img" type="url" placeholder="https://…" oninput="prevImg()"/>
+    <div class="img-prev-wrap" id="img-prev-wrap" style="display:none">
+      <img class="img-prev-thumb" id="img-prev-thumb" src="" alt=""/>
+      <span style="font-size:11px;color:var(--muted);">Preview</span>
+    </div>
+    <p class="fhint">Right-click any card image online → Copy image address</p>
+  </div>
+  <div class="fg">
+    <label class="fl">Notes</label>
+    <input id="mc-notes" type="text" placeholder="e.g. Only want holo, saw at $45 at TCG Con"/>
+  </div>
+
+  <!-- Owned section (shown when editing owned card) -->
+  <div id="mc-owned-section" style="display:none;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">📦 Ownership Details</div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Condition</label>
+        <select id="mc-cond">
+          <option value="NM">NM — Near Mint</option>
+          <option value="LP">LP — Lightly Played</option>
+          <option value="MP">MP — Mod. Played</option>
+          <option value="HP">HP — Heavy Played</option>
+          <option value="DMG">DMG — Damaged</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Paid $</label>
+        <input id="mc-paid" type="number" placeholder="0.00" step="0.01"/>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Market Value $</label>
+        <input id="mc-mktval" type="number" placeholder="0.00" step="0.01"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Acquired At</label>
+        <input id="mc-venue" type="text" placeholder="e.g. TCG Con Phoenix"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Date Acquired</label>
+      <input id="mc-date" type="date"/>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:10px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:8px;padding:10px;">
+      <input type="checkbox" id="mc-upgrade" style="width:18px;height:18px;accent-color:var(--amber);flex-shrink:0;"/>
+      <label for="mc-upgrade" style="font-size:12px;color:var(--amber);cursor:pointer;">Flag for upgrade (want better condition)</label>
+    </div>
+  </div>
+
+  <div class="mactions">
+    <button class="btn btn-accent" style="flex:2;" onclick="saveCard()">Save</button>
+    <button class="btn btn-danger" style="flex:1;display:none;" id="mc-delete" onclick="deleteCard()">Delete</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BULK ADD MODAL
+══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-bulk">
+<div class="modal">
+  <div class="modal-title">
+    <span>Bulk Add Cards</span>
+    <button class="modal-close" onclick="closeModal('modal-bulk')">×</button>
+  </div>
+  <div class="fg">
+    <label class="fl">Set / Era</label>
+    <select id="bulk-era"></select>
+  </div>
+  <div class="fg">
+    <label class="fl">Priority for all</label>
+    <div class="radio-grp" id="bulk-pri-grp">
+      <label class="radio-opt sel"><input type="radio" name="bpri" value="">Normal</label>
+      <label class="radio-opt"><input type="radio" name="bpri" value="need">📌 Need</label>
+      <label class="radio-opt"><input type="radio" name="bpri" value="big">⭐ Big</label>
+      <label class="radio-opt"><input type="radio" name="bpri" value="huge">🔥 Huge</label>
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">Cards (one per line: Name, Number)</label>
+    <p class="bulk-hint">Each line = one card. Format:<br>
+    <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">Umbreon VMAX, 215/203</code><br>
+    Or just the name:<br>
+    <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">Umbreon VMAX</code></p>
+    <textarea id="bulk-text" rows="8" placeholder="Umbreon VMAX, 215/203&#10;Rayquaza VMAX, 218/203&#10;Espeon V Alt, 180/203"></textarea>
+  </div>
+  <div id="bulk-preview" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
+  <div class="mactions">
+    <button class="btn btn-ghost" style="flex:1;" onclick="closeModal('modal-bulk')">Cancel</button>
+    <button class="btn btn-accent" style="flex:2;" onclick="saveBulk()">Add All Cards</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ERA MODAL
+══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-era">
+<div class="modal">
+  <div class="modal-title">
+    <span id="me-title">Add Set</span>
+    <button class="modal-close" onclick="closeModal('modal-era')">×</button>
+  </div>
+  <div class="fg">
+    <label class="fl">Set Name</label>
+    <input id="me-name" type="text" placeholder="e.g. S&V: Chaos Rising"/>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-accent" style="flex:2;" onclick="saveEra()">Save</button>
+    <button class="btn btn-danger" style="flex:1;display:none;" id="me-delete" onclick="deleteEra()">Delete</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SHOW LOG MODAL
+══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-show">
+<div class="modal">
+  <div class="modal-title">
+    <span id="ms-title">Log a Show</span>
+    <button class="modal-close" onclick="closeModal('modal-show')">×</button>
+  </div>
+  <div class="frow">
+    <div class="fg">
+      <label class="fl">Venue / Show Name</label>
+      <input id="ms-venue" type="text" placeholder="e.g. TCG Con Phoenix"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Date</label>
+      <input id="ms-date" type="date"/>
+    </div>
+  </div>
+  <div class="frow">
+    <div class="fg">
+      <label class="fl">Location</label>
+      <input id="ms-loc" type="text" placeholder="e.g. Gilbert, AZ"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Total Spent $</label>
+      <input id="ms-spent" type="number" placeholder="0.00" step="0.01"/>
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">Cards Bought (comma separated)</label>
+    <textarea id="ms-cards" rows="3" placeholder="Umbreon VMAX, Mew SIR, Latias SIR…"></textarea>
+  </div>
+  <div class="fg">
+    <label class="fl">Notes</label>
+    <input id="ms-notes" type="text" placeholder="General notes about the show…"/>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-accent" style="flex:2;" onclick="saveShow()">Save</button>
+    <button class="btn btn-danger" style="flex:1;display:none;" id="ms-delete" onclick="deleteShow()">Delete</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CONFIRM MODAL
+══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-confirm">
+<div class="modal">
+  <div class="modal-title">
+    <span id="conf-title">Are you sure?</span>
+    <button class="modal-close" onclick="closeModal('modal-confirm')">×</button>
+  </div>
+  <p id="conf-msg" style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;"></p>
+  <div class="mactions">
+    <button class="btn btn-ghost" style="flex:1;" onclick="closeModal('modal-confirm')">Cancel</button>
+    <button class="btn btn-danger" style="flex:1;" id="conf-ok">Confirm</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA MODEL
+//  Card: [era, name, num, priority, imgUrl, buyTarget, notes]
+//  OwnedData: { [cardKey]: { condition, pricePaid, marketValue, acquiredAt, acquiredDate, upgradeFlag } }
+//  Shows: [{ id, venue, date, location, spent, cards, notes }]
+// ═══════════════════════════════════════════════════════
+
+const DEFAULT_CARDS=[
+["Diamond & Pearl","Empoleon LV.X","120/130","","","",""],
+["Diamond & Pearl","Infernape LV.X","121/130","","","",""],
+["Diamond & Pearl","Torterra LV.X","122/130","","","",""],
+["D&P: Mysterious Treasures","Electivire LV.X","121/123","","","",""],
+["D&P: Mysterious Treasures","Lucario LV.X","122/123","","","",""],
+["D&P: Mysterious Treasures","Magmortar LV.X","123/123","","","",""],
+["D&P: Mysterious Treasures","Time Space Distortion","124/123","big","","",""],
+["D&P: Secret Wonders","Gardevoir LV.X","131/132","","","",""],
+["D&P: Secret Wonders","Honchkrow LV.X","132/132","","","",""],
+["D&P: Great Encounters","Cresselia LV.X","103/106","","","",""],
+["D&P: Great Encounters","Darkrai LV.X","104/106","","","",""],
+["D&P: Great Encounters","Dialga LV.X","105/106","","","",""],
+["D&P: Great Encounters","Palkia LV.X","106/106","","","",""],
+["D&P: Majestic Dawn","Garchomp LV.X","97/100","","","",""],
+["D&P: Majestic Dawn","Glaceon LV.X","98/100","","","",""],
+["D&P: Majestic Dawn","Leafeon LV.X","99/100","","","",""],
+["D&P: Majestic Dawn","Porygon-Z LV.X","100/100","","","",""],
+["D&P: Legends Awakened","Azelf LV.X","140/146","","","",""],
+["D&P: Legends Awakened","Gliscor LV.X","141/146","","","",""],
+["D&P: Legends Awakened","Magnezone LV.X","142/146","","","",""],
+["D&P: Legends Awakened","Mesprit LV.X","143/146","","","",""],
+["D&P: Legends Awakened","Mewtwo LV.X","144/146","","","",""],
+["D&P: Legends Awakened","Rhyperior LV.X","145/146","","","",""],
+["D&P: Legends Awakened","Uxie LV.X","146/146","","","",""],
+["D&P: Storm Front","Dusknoir LV.X","96/100","","","",""],
+["D&P: Storm Front","Heatran LV.X","97/100","","","",""],
+["D&P: Storm Front","Machamp LV.X","98/100","","","",""],
+["D&P: Storm Front","Raichu LV.X","99/100","","","",""],
+["D&P: Storm Front","Regigigas LV.X","100/100","","","",""],
+["D&P: Storm Front","Charmander SR","101/100","","","",""],
+["D&P: Storm Front","Charmeleon SR","102/100","","","",""],
+["D&P: Storm Front","Charizard SR","103/100","","","",""],
+["D&P: Storm Front","Drifloon SH1","104/100","","","",""],
+["D&P: Storm Front","Duskull SH2","105/100","","","",""],
+["D&P: Storm Front","Voltorb SH3","106/100","","","",""],
+["Platinum","Dialga LV.X","122/127","","","",""],
+["Platinum","Drapion LV.X","123/127","huge","","",""],
+["Platinum","Giratina LV.X","124/127","","","",""],
+["Platinum","Palkia LV.X","125/127","","","",""],
+["Platinum","Shaymin LV.X","126/127","","","",""],
+["Platinum","Shaymin LV.X","127/127","","","",""],
+["Platinum","Lotad SH4","131/127","","","",""],
+["Platinum","Swablu SH5","132/127","","","",""],
+["Platinum","Vulpix SH6","133/127","","","",""],
+["Platinum: Rising Rivals","Alakazam LV.X","103/111","","","",""],
+["Platinum: Rising Rivals","Floatzel LV.X","104/111","","","",""],
+["Platinum: Rising Rivals","Flygon LV.X","105/111","","","",""],
+["Platinum: Rising Rivals","Gallade LV.X","106/111","","","",""],
+["Platinum: Rising Rivals","Hippowdon LV.X","107/111","","","",""],
+["Platinum: Rising Rivals","Infernape LV.X","108/111","","","",""],
+["Platinum: Rising Rivals","Luxray","109/111","","","",""],
+["Platinum: Rising Rivals","Mismagius","110/111","","","",""],
+["Platinum: Rising Rivals","Snorlax","111/111","","","",""],
+["Platinum: Rising Rivals","Pikachu SR","112/111","","","",""],
+["Platinum: Supreme Victors","Absol LV.X","141/147","","","",""],
+["Platinum: Supreme Victors","Blaziken LV.X","142/147","","","",""],
+["Platinum: Supreme Victors","Charizard LV.X","143/147","","","",""],
+["Platinum: Supreme Victors","Electivire LV.X","144/147","","","",""],
+["Platinum: Supreme Victors","Garchomp LV.X","145/147","","","",""],
+["Platinum: Supreme Victors","Rayquaza LV.X","146/147","","","",""],
+["Platinum: Supreme Victors","Staraptor","147/147","","","",""],
+["Platinum: Supreme Victors","Articuno SR","148/147","","","",""],
+["Platinum: Supreme Victors","Moltres SR","149/147","","","",""],
+["Platinum: Supreme Victors","Zapdos SR","150/147","","","",""],
+["Platinum: Supreme Victors","Milotic SH7","151/147","","","",""],
+["Platinum: Supreme Victors","Relicanth SH8","152/147","","","",""],
+["Platinum: Supreme Victors","Yanma SH9","153/147","","","",""],
+["Platinum: Arceus","Arceus LV.X (x3)","94-96/99","","","",""],
+["Platinum: Arceus","Gengar LV.X","97/99","","","",""],
+["Platinum: Arceus","Salamence LV.X","98/99","","","",""],
+["Platinum: Arceus","Tangrowth LV.X","99/99","","","",""],
+["Platinum: Arceus","AR1-AR9 Arceus SRs","100-108/99","","","",""],
+["Platinum: Arceus","Bagon/Ponyta/Shinx SH","109/99","","","",""],
+["HeartGold SoulSilver","Ampharos","105/123","","","",""],
+["HeartGold SoulSilver","Blissey","106/123","","","",""],
+["HeartGold SoulSilver","Donphan","107/123","","","",""],
+["HeartGold SoulSilver","Feraligatr","108/123","","","",""],
+["HeartGold SoulSilver","Meganium","109/123","","","",""],
+["HeartGold SoulSilver","Typhlosion","110/123","","","",""],
+["HeartGold SoulSilver","Gyarados","123/123","","","",""],
+["HeartGold SoulSilver","Alph Lithograph SR","124/123","","","",""],
+["HGSS: Unleashed","Crobat","84/95","","","",""],
+["HGSS: Unleashed","Kingdra","85/95","","","",""],
+["HGSS: Unleashed","Lanturn","86/95","","","",""],
+["HGSS: Unleashed","Steelix","87/95","","","",""],
+["HGSS: Unleashed","Tyranitar","88/95","","","",""],
+["HGSS: Unleashed","Ursaring","89/95","","","",""],
+["HGSS: Unleashed","Alph Lithograph SR","96/95","","","",""],
+["HGSS: Undaunted","Espeon","81/90","","","",""],
+["HGSS: Undaunted","Houndoom","82/90","","","",""],
+["HGSS: Undaunted","Raichu","83/90","","","",""],
+["HGSS: Undaunted","Scizor","84/90","","","",""],
+["HGSS: Undaunted","Slowking","85/90","","","",""],
+["HGSS: Undaunted","Umbreon","86/90","","","",""],
+["HGSS: Undaunted","Alph Lithograph SR","91/90","","","",""],
+["HGSS: Triumphant","Absol","91/102","","","",""],
+["HGSS: Triumphant","Celebi","92/102","","","",""],
+["HGSS: Triumphant","Electrode","93/102","","","",""],
+["HGSS: Triumphant","Gengar","94/102","","","",""],
+["HGSS: Triumphant","Machamp","95/102","","","",""],
+["HGSS: Triumphant","Magnezone","96/102","","","",""],
+["HGSS: Triumphant","Mew","97/102","","","",""],
+["HGSS: Triumphant","Yanmega","98/102","","","",""],
+["HGSS: Triumphant","Alph Lithograph SR","103/102","","","",""],
+["Black & White","Reshiram","113/114","","","",""],
+["Black & White","Zekrom","114/114","","","",""],
+["Black & White","Pikachu SR","115/114","","","",""],
+["B&W: Emerging Powers","Thundurus","97/98","","","",""],
+["B&W: Emerging Powers","Tornadus","98/98","","","",""],
+["B&W: Noble Victories","Virizion","97/101","","","",""],
+["B&W: Noble Victories","Victini","98/101","","","",""],
+["B&W: Noble Victories","Terrakion","99/101","","","",""],
+["B&W: Noble Victories","Cobalion","100/101","","","",""],
+["B&W: Noble Victories","N (Trainer)","101/101","","","",""],
+["B&W: Noble Victories","Meowth SR","102/101","","","",""],
+["B&W: Next Destinies","Emboar SR","100/99","","","",""],
+["B&W: Next Destinies","Chandelure SR","101/99","","","",""],
+["B&W: Next Destinies","Zoroark SR","102/99","","","",""],
+["B&W: Next Destinies","Hydreigon SR","103/99","","","",""],
+["B&W: Dark Explorers","Empoleon","29/108","","","",""],
+["B&W: Dark Explorers","Gardevoir SR","109/108","","","",""],
+["B&W: Dark Explorers","Archeops SR","110/108","","","",""],
+["B&W: Dark Explorers","Pokemon Catcher SR","111/108","","","",""],
+["B&W: Dragons Exalted","Mew","120/124","","","",""],
+["B&W: Dragons Exalted","Rayquaza","123/124","","","",""],
+["B&W: Dragons Exalted","Giratina","124/124","","","",""],
+["B&W: Dragons Exalted","Serperior SR","125/124","","","",""],
+["B&W: Dragons Exalted","Reuniclus SR","126/124","","","",""],
+["B&W: Dragons Exalted","Krookodile SR","127/124","","","",""],
+["B&W: Dragons Exalted","Rayquaza SR","128/124","huge","","",""],
+["B&W: Boundaries Crossed","Golurk SR","150/149","","","",""],
+["B&W: Boundaries Crossed","Terrakion SR","151/149","","","",""],
+["B&W: Boundaries Crossed","Altaria SR","152/149","huge","","",""],
+["B&W: Boundaries Crossed","Rocky Helmet SR","153/149","","","",""],
+["B&W: Plasma Storm","Turtwig","1/135","","","",""],
+["B&W: Plasma Storm","Grotle","2/135","","","",""],
+["B&W: Plasma Storm","Torterra","3/135","","","",""],
+["B&W: Plasma Storm","Chimchar","15/135","","","",""],
+["B&W: Plasma Storm","Monferno","16/135","","","",""],
+["B&W: Plasma Storm","Infernape","17/135","","","",""],
+["B&W: Plasma Storm","Manaphy","34/135","","","",""],
+["B&W: Plasma Storm","Charizard SR","136/135","","","",""],
+["B&W: Plasma Storm","Blastoise SR","137/135","","","",""],
+["B&W: Plasma Storm","Random Receiver SR","137/135","","","",""],
+["B&W: Plasma Freeze","Deoxys","111/116","","","",""],
+["B&W: Plasma Freeze","Empoleon SR","117/116","huge","","",""],
+["B&W: Plasma Freeze","Sigilyph SR","118/116","","","",""],
+["B&W: Plasma Freeze","Garbodor SR","119/116","","","",""],
+["B&W: Plasma Freeze","Garchomp SR","120/116","","","",""],
+["B&W: Plasma Freeze","Max Potion SR","121/116","","","",""],
+["B&W: Plasma Freeze","Ultra Ball SR","122/116","","","",""],
+["B&W: Plasma Blast","Dialga","99/101","","","",""],
+["B&W: Plasma Blast","Palkia","100/101","","","",""],
+["B&W: Plasma Blast","Exeggute SR","102/101","","","",""],
+["B&W: Plasma Blast","Virizion SR","103/101","","","",""],
+["B&W: Plasma Blast","Dusknoir SR","104/101","","","",""],
+["B&W: Plasma Blast","Rare Candy SR","105/101","","","",""],
+["B&W: Legendary Treasures","Empoleon","35/113","","","",""],
+["XY: Phantom Forces","Dialga","122/119","","","",""],
+["XY: Double Crisis","Team Aqua's Kyogre","6/34","","","",""],
+["XY: Double Crisis","Team Magma's Groudon","15/34","","","",""],
+["XY: BREAKthrough","Mewtwo SR","163/162","","","",""],
+["XY: BREAKthrough","Mewtwo SR","164/162","","","",""],
+["XY: BREAKpoint","Gyarados SR","123/122","","","",""],
+["XY: Fates Collide","Team Rocket's Handiwork","124/124","","","",""],
+["XY: Fates Collide","Alakazam SR","125/124","","","",""],
+["XY: Steam Siege","Volcanion SR","115/114","","","",""],
+["XY: Steam Siege","Gardevoir SR","116/114","","","",""],
+["S&M: Shining Legends","Mewtwo GX SR","78/73","","","",""],
+["S&M: Ultra Prism","Empoleon","34/156","","","",""],
+["S&M: Team Up","Celebi & Venusaur GX","1/181","","","",""],
+["S&M: Team Up","Pikachu & Zekrom GX","33/181","","","",""],
+["S&M: Team Up","Gengar & Mimikyu GX","53/181","","","",""],
+["S&M: Team Up","Latias & Latios GX","113/181","","","",""],
+["S&M: Team Up","Eevee & Snorlax GX","120/181","","","",""],
+["S&M: Team Up","Magikarp & Wailord GX","160/181","","","",""],
+["S&M: Team Up","Magikarp & Wailord Alt","161/181","","","",""],
+["S&M: Team Up","Pikachu & Zekrom Alt","162/181","","","",""],
+["S&M: Team Up","Gengar & Mimikyu Alt","164/181","","","",""],
+["S&M: Team Up","Gengar & Mimikyu Alt","165/181","","","",""],
+["S&M: Team Up","Latias & Latios Alt","169/181","","","",""],
+["S&M: Team Up","Latias & Latios Alt","170/181","","","",""],
+["S&M: Team Up","Eevee & Snorlax Alt","171/181","","","",""],
+["S&M: Unbroken Bonds","Pheromosa & Buzzwole GX","1/214","","","",""],
+["S&M: Unbroken Bonds","Reshiram & Charizard GX","20/214","","","",""],
+["S&M: Unbroken Bonds","Muk & Alolan Muk GX","61/214","","","",""],
+["S&M: Unbroken Bonds","Marshadow & Machamp GX","82/214","","","",""],
+["S&M: Unbroken Bonds","Greninja & Zoroark GX","107/214","","","",""],
+["S&M: Unbroken Bonds","Lucario & Melmetal GX","120/214","","","",""],
+["S&M: Unbroken Bonds","Gardevoir & Sylveon GX","130/214","","","",""],
+["S&M: Unbroken Bonds","Pheromosa & Buzzwole Alt","191/214","","","",""],
+["S&M: Unbroken Bonds","Pheromosa & Buzzwole Alt","192/214","","","",""],
+["S&M: Unbroken Bonds","Muk & Alolan Muk Alt","196/214","","","",""],
+["S&M: Unbroken Bonds","Muk & Alolan Muk Alt","197/214","","","",""],
+["S&M: Unbroken Bonds","Marshadow & Machamp Alt","198/214","","","",""],
+["S&M: Unbroken Bonds","Marshadow & Machamp Alt","199/214","","","",""],
+["S&M: Unbroken Bonds","Greninja & Zoroark Alt","200/214","","","",""],
+["S&M: Unbroken Bonds","Greninja & Zoroark Alt","201/214","","","",""],
+["S&M: Unbroken Bonds","Lucario & Melmetal Alt","203/214","","","",""],
+["S&M: Unbroken Bonds","Gardevoir & Sylveon Alt","204/214","","","",""],
+["S&M: Unbroken Bonds","Gardevoir & Sylveon Alt","205/214","","","",""],
+["S&M: Unified Minds","Rowlet & Alolan Exeggutor","1/236","","","",""],
+["S&M: Unified Minds","Slowpoke & Psyduck GX","35/236","","","",""],
+["S&M: Unified Minds","Raichu & Alolan Raichu GX","54/236","","","",""],
+["S&M: Unified Minds","Mew & Mewtwo GX","71/236","","","",""],
+["S&M: Unified Minds","Espeon & Deoxys GX","72/236","","","",""],
+["S&M: Unified Minds","Umbreon & Darkrai GX","125/236","","","",""],
+["S&M: Unified Minds","Mega Sableye & Tyranitar GX","126/236","","","",""],
+["S&M: Unified Minds","Garchomp & Giratina GX","146/236","","","",""],
+["S&M: Unified Minds","Slowpoke & Psyduck Alt","217/236","","","",""],
+["S&M: Unified Minds","Slowpoke & Psyduck Alt","218/236","","","",""],
+["S&M: Unified Minds","Raichu & Alolan Raichu Alt","220/236","","","",""],
+["S&M: Unified Minds","Raichu & Alolan Raichu Alt","221/236","","","",""],
+["S&M: Unified Minds","Mewtwo & Mew Alt","222/236","","","",""],
+["S&M: Unified Minds","Mega Sableye & Tyranitar Alt","225/236","","","",""],
+["S&M: Unified Minds","Mega Sableye & Tyranitar Alt","226/236","","","",""],
+["S&M: Unified Minds","Garchomp & Giratina Alt","228/236","","","",""],
+["S&M: Hidden Fates","Moltres & Zapdos & Articuno GX","44/68","","","",""],
+["S&M: Hidden Fates","Moltres & Zapdos & Articuno Alt","66/68","","","",""],
+["S&M: Hidden Fates","Jessie & James","68/68","","","",""],
+["S&M: Hidden Fates","SV1-SV45 Shiny Cards","SV1-45","","","",""],
+["S&M: Hidden Fates","Cynthia SV82","SV82","","","",""],
+["S&M: Cosmic Eclipse","Venusaur & Snivy GX","1/236","","","",""],
+["S&M: Cosmic Eclipse","Charizard & Braixen GX","22/236","","","",""],
+["S&M: Cosmic Eclipse","Blastoise & Piplup GX","38/236","big","","",""],
+["S&M: Cosmic Eclipse","Empoleon","56/236","","","",""],
+["S&M: Cosmic Eclipse","Solgaleo & Lunala GX","75/236","","","",""],
+["S&M: Cosmic Eclipse","Togepi & Cleffa & Igglypuff GX","143/236","","","",""],
+["S&M: Cosmic Eclipse","Arceus & Dialga & Palkia GX","156/236","","","",""],
+["S&M: Cosmic Eclipse","Reshiram & Zekrom GX","157/236","","","",""],
+["S&M: Cosmic Eclipse","Naganadel & Guzzlord GX","158/236","","","",""],
+["S&M: Cosmic Eclipse","Mega Lopunny & Jigglypuff GX","165/236","","","",""],
+["S&M: Cosmic Eclipse","Venusaur & Snivy Alt","210/236","","","",""],
+["S&M: Cosmic Eclipse","Charizard & Braixen Alt","212/236","","","",""],
+["S&M: Cosmic Eclipse","Blastoise & Piplup Alt","214/236","big","","",""],
+["S&M: Cosmic Eclipse","Blastoise & Piplup Alt","215/236","big","","",""],
+["S&M: Cosmic Eclipse","Solgaleo & Lunala Alt","216/236","","","",""],
+["S&M: Cosmic Eclipse","Arceus & Dialga & Palkia Alt","220/236","","","",""],
+["S&M: Cosmic Eclipse","Arceus & Dialga & Palkia Alt","221/236","","","",""],
+["S&M: Cosmic Eclipse","Reshiram & Zekrom Alt","222/236","","","",""],
+["S&M: Cosmic Eclipse","Naganadel & Guzzlord Alt","223/236","","","",""],
+["S&M: Cosmic Eclipse","Naganadel & Guzzlord Alt","224/236","","","",""],
+["S&M: Cosmic Eclipse","Mega Lopunny & Jigglypuff Alt","225/236","","","",""],
+["S&M: Cosmic Eclipse","Mega Lopunny & Jigglypuff Alt","226/236","","","",""],
+["S&M: Cosmic Eclipse","Cynthia & Caitlin","228/236","","","",""],
+["S&M: Cosmic Eclipse","Red & Blue","234/236","","","",""],
+["S&M: Cosmic Eclipse","Torkoal SR","237/236","","","",""],
+["S&M: Cosmic Eclipse","Weavile SR","238/236","","","",""],
+["S&M: Cosmic Eclipse","Piplup SR","239/236","big","","",""],
+["S&M: Cosmic Eclipse","Wishiwashi SR","240/236","","","",""],
+["S&M: Cosmic Eclipse","Pikachu SR","241/236","","","",""],
+["S&M: Cosmic Eclipse","Magnemite SR","242/236","","","",""],
+["S&M: Cosmic Eclipse","Koffing SR","243/236","","","",""],
+["S&M: Cosmic Eclipse","Gallade SR","244/236","","","",""],
+["S&M: Cosmic Eclipse","Mimikyu SR","245/236","","","",""],
+["S&M: Cosmic Eclipse","Excadrill SR","246/236","","","",""],
+["S&M: Cosmic Eclipse","Steelix SR","247/236","","","",""],
+["S&M: Cosmic Eclipse","Stoutland SR","248/236","","","",""],
+["Sword & Shield","Snorlax","142/202","","","",""],
+["S&S: Rebel Clash","Toxtricity","70/192","","","",""],
+["S&S: Vivid Voltage","Celebi","9/185","","","",""],
+["S&S: Vivid Voltage","Zacian","82/185","","","",""],
+["S&S: Vivid Voltage","Jirachi","119/185","","","",""],
+["S&S: Shining Fates","Reshiram SV","17/72","","","",""],
+["S&S: Shining Fates","Kyogre SV","21/72","","","",""],
+["S&S: Shining Fates","Yveltal SV","46/72","","","",""],
+["S&S: Shining Fates","SV1-SV105 Shiny Cards","SV1-105","","","",""],
+["S&S: Shining Fates","SV118/119/121/122","SV118+","","","",""],
+["S&S: Chilling Reign","Ice Rider Calyrex Alt","164/198","","","",""],
+["S&S: Chilling Reign","Zeraora Alt","166/198","","","",""],
+["S&S: Chilling Reign","Galarian Rapidash Alt","168/198","","","",""],
+["S&S: Chilling Reign","Galarian Articuno Alt","170/198","","","",""],
+["S&S: Chilling Reign","Shadow Rider Calyrex Alt","172/198","","","",""],
+["S&S: Chilling Reign","Galarian Zapdos Alt","174/198","","","",""],
+["S&S: Chilling Reign","Galarian Moltres Alt","177/198","","","",""],
+["S&S: Chilling Reign","Galarian Slowking Alt","179/198","","","",""],
+["S&S: Chilling Reign","Blissey Alt","183/198","","","",""],
+["S&S: Chilling Reign","Tornadus Alt","185/198","","","",""],
+["S&S: Chilling Reign","Blaziken SR","201/198","","","",""],
+["S&S: Chilling Reign","Ice Rider Calyrex SR","203/198","","","",""],
+["S&S: Chilling Reign","Shadow Rider Calyrex SR","205/198","","","",""],
+["S&S: Evolving Skies","Leafeon Alt","167/203","","","",""],
+["S&S: Evolving Skies","Glaceon Alt","175/203","","","",""],
+["S&S: Evolving Skies","Espeon Alt","180/203","","","",""],
+["S&S: Evolving Skies","Golurk Alt","182/203","","","",""],
+["S&S: Evolving Skies","Sylveon Alt","184/203","","","",""],
+["S&S: Evolving Skies","Medicham Alt","186/203","","","",""],
+["S&S: Evolving Skies","Umbreon Alt","189/203","","","",""],
+["S&S: Evolving Skies","Dragonite Alt","192/203","","","",""],
+["S&S: Evolving Skies","Rayquaza Alt","194/203","","","",""],
+["S&S: Evolving Skies","Noivern Alt","196/203","","","",""],
+["S&S: Evolving Skies","Duraludon Alt","198/203","","","",""],
+["S&S: Evolving Skies","Leafeon SR","205/203","","","",""],
+["S&S: Evolving Skies","Glaceon SR","209/203","","","",""],
+["S&S: Evolving Skies","Sylveon SR","212/203","","","",""],
+["S&S: Evolving Skies","Umbreon VMAX SR","215/203","huge","","",""],
+["S&S: Evolving Skies","Rayquaza VMAX SR","218/203","","","",""],
+["S&S: Evolving Skies","Duraludon SR","220/203","","","",""],
+["S&S: Fusion Strike","Celebi Alt","245/264","","","",""],
+["S&S: Fusion Strike","Mew Alt","251/264","","","",""],
+["S&S: Fusion Strike","Sandaconda Alt","252/264","","","",""],
+["S&S: Fusion Strike","Genesect Alt","255/264","","","",""],
+["S&S: Fusion Strike","Greedent Alt","257/264","","","",""],
+["S&S: Fusion Strike","Inteleon SR","266/264","","","",""],
+["S&S: Fusion Strike","Mew SR","269/264","","","",""],
+["S&S: Fusion Strike","Espeon SR","270/264","","","",""],
+["S&S: Fusion Strike","Gengar SR","271/264","","","",""],
+["S&S: Brilliant Stars","Charizard","154/172","","","",""],
+["S&S: Brilliant Stars","Lumineon","156/172","","","",""],
+["S&S: Brilliant Stars","Honchkrow","162/172","","","",""],
+["S&S: Brilliant Stars","Arceus","166/172","","","",""],
+["S&S: Brilliant Stars","Barry","167/172","","","",""],
+["S&S: Brilliant Stars","Cynthia's Ambition","169/172","","","",""],
+["S&S: Astral Radiance","Beedrill Alt","161/189","","","",""],
+["S&S: Astral Radiance","Hisuian Lilligant Alt","163/189","","","",""],
+["S&S: Astral Radiance","Origin Forme Palkia Alt","167/189","","","",""],
+["S&S: Astral Radiance","Machamp Alt","172/189","","","",""],
+["S&S: Astral Radiance","Hisuian Sneasler Alt","175/189","","","",""],
+["S&S: Astral Radiance","Origin Forme Dialga Alt","177/189","","","",""],
+["S&S: Pokemon GO","Mewtwo","72/82","","","",""],
+["S&S: Pokemon GO","Conkeldurr","74/82","","","",""],
+["S&S: Pokemon GO","Ditto","53/82","","","",""],
+["S&S: Pokemon GO","Pikachu","27/82","","","",""],
+["S&S: Pokemon GO","Charizard","10/82","","","",""],
+["S&S: Pokemon GO","Radiant Charizard","11/82","","","",""],
+["S&S: Pokemon GO","Radiant Venusaur","4/82","","","",""],
+["S&S: Pokemon GO","Radiant Blastoise","18/82","","","",""],
+["S&S: Lost Origin","Rotom Alt","177/196","","","",""],
+["S&S: Lost Origin","Aerodactyl Alt","180/196","","","",""],
+["S&S: Lost Origin","Galarian Perrserker Alt","184/196","","","",""],
+["S&S: Lost Origin","Giratina Alt","186/196","","","",""],
+["S&S: Lost Origin","Giratina SR","212/196","","","",""],
+["S&S: Silver Tempest","Unown Alt","177/198","","","",""],
+["S&S: Silver Tempest","Skuntank Alt","181/198","","","",""],
+["S&S: Silver Tempest","Regidrago Alt","184/198","","","",""],
+["S&S: Silver Tempest","Lugia Alt","186/198","","","",""],
+["S&S: Crown Zenith","Radiant Eternatus","105/151","","","",""],
+["S&S: Crown Zenith","Pikachu SR","160/151","","","",""],
+["Scarlet & Violet","Pawmot IR","209/198","","","",""],
+["S&V: Paldea Evolved","Fuecoco IR","201/193","huge","","",""],
+["S&V: Paldea Evolved","Raichu IR","211/193","huge","","",""],
+["S&V: Paldea Evolved","Maushold IR","226/193","huge","","",""],
+["S&V: Paldea Evolved","Heracross IR","194/193","","","",""],
+["S&V: Paldea Evolved","Tropius IR","195/193","","","",""],
+["S&V: Paldea Evolved","Sprigatito IR","196/193","","","",""],
+["S&V: Paldea Evolved","Bramblin IR","198/193","","","",""],
+["S&V: Paldea Evolved","Fletchinder IR","199/193","","","",""],
+["S&V: Paldea Evolved","Crocalor IR","202/193","","","",""],
+["S&V: Paldea Evolved","Magikarp IR","203/193","","","",""],
+["S&V: Paldea Evolved","Marill IR","204/193","","","",""],
+["S&V: Paldea Evolved","Eiscue IR","205/193","","","",""],
+["S&V: Paldea Evolved","Quaxwell IR","207/193","","","",""],
+["S&V: Paldea Evolved","Frigibax IR","208/193","","","",""],
+["S&V: Paldea Evolved","Arctibax IR","209/193","","","",""],
+["S&V: Paldea Evolved","Baxcalibur IR","210/193","","","",""],
+["S&V: Paldea Evolved","Mismagius IR","212/193","","","",""],
+["S&V: Paldea Evolved","Gothorita IR","213/193","","","",""],
+["S&V: Paldea Evolved","Sandygast IR","214/193","","","",""],
+["S&V: Paldea Evolved","Rabsca IR","215/193","","","",""],
+["S&V: Paldea Evolved","Tinkatink IR","216/193","","","",""],
+["S&V: Paldea Evolved","Tinkatuff IR","217/193","","","",""],
+["S&V: Paldea Evolved","Paldean Tauros IR","218/193","","","",""],
+["S&V: Paldea Evolved","Sudowoodo IR","219/193","","","",""],
+["S&V: Paldea Evolved","Nacli IR","220/193","","","",""],
+["S&V: Paldea Evolved","Tyranitar IR","222/193","","","",""],
+["S&V: Paldea Evolved","Grafaiai IR","223/193","","","",""],
+["S&V: Paldea Evolved","Orthoworm IR","224/193","","","",""],
+["S&V: Paldea Evolved","Flamigo IR","227/193","","","",""],
+["S&V: Paldea Evolved","Farigiraf IR","228/193","","","",""],
+["S&V: Paldea Evolved","Dudunsparce IR","229/193","","","",""],
+["S&V: Paldea Evolved","Meowscarada SIR","256/193","","","",""],
+["S&V: Paldea Evolved","Wo-Chien SIR","257/193","","","",""],
+["S&V: Paldea Evolved","Skeledirge SIR","258/193","","","",""],
+["S&V: Paldea Evolved","Chi-Yu SIR","259/193","","","",""],
+["S&V: Paldea Evolved","Quaquaval SIR","260/193","","","",""],
+["S&V: Paldea Evolved","Chien-Pao SIR","261/193","","","",""],
+["S&V: Paldea Evolved","Ting-Lu SIR","263/193","","","",""],
+["S&V: Paldea Evolved","Squawkabilly SIR","264/193","","","",""],
+["S&V: 151","Charizard SIR","199/165","huge","","",""],
+["S&V: 151","Blastoise SIR","200/165","big","","",""],
+["S&V: 151","Bulbasaur IR","166/165","","","",""],
+["S&V: 151","Charmander IR","168/165","","","",""],
+["S&V: 151","Charmeleon IR","169/165","","","",""],
+["S&V: 151","Squirtle IR","170/165","","","",""],
+["S&V: 151","Caterpie IR","172/165","","","",""],
+["S&V: 151","Nidoking IR","174/165","","","",""],
+["S&V: 151","Psyduck IR","175/165","","","",""],
+["S&V: 151","Tangela IR","178/165","","","",""],
+["S&V: 151","Mr. Mime IR","179/165","","","",""],
+["S&V: 151","Dragonair IR","181/165","","","",""],
+["S&V: 151","Alakazam SIR","201/165","","","",""],
+["S&V: 151","Zapdos SIR","202/165","","","",""],
+["S&V: Paradox Rift","Steelix IR","208/182","huge","","",""],
+["S&V: Paradox Rift","Dottler IR","184/182","","","",""],
+["S&V: Paradox Rift","Toedscruel IR","185/182","","","",""],
+["S&V: Paradox Rift","Magby IR","186/182","","","",""],
+["S&V: Paradox Rift","Iron Moth IR","187/182","","","",""],
+["S&V: Paradox Rift","Snorunt IR","188/182","","","",""],
+["S&V: Paradox Rift","Mantyke IR","189/182","","","",""],
+["S&V: Paradox Rift","Vanillish IR","190/182","","","",""],
+["S&V: Paradox Rift","Veluza IR","192/182","","","",""],
+["S&V: Paradox Rift","Plusle IR","193/182","","","",""],
+["S&V: Paradox Rift","Minun IR","194/182","","","",""],
+["S&V: Paradox Rift","Blitzle IR","195/182","","","",""],
+["S&V: Paradox Rift","Joltik IR","196/182","","","",""],
+["S&V: Paradox Rift","Espathra IR","197/182","","","",""],
+["S&V: Paradox Rift","Gimmighoul IR","198/182","","","",""],
+["S&V: Paradox Rift","Groudon IR","199/182","","","",""],
+["S&V: Paradox Rift","Mienshao IR","200/182","","","",""],
+["S&V: Paradox Rift","Minior IR","201/182","","","",""],
+["S&V: Paradox Rift","Garganacl IR","202/182","","","",""],
+["S&V: Paradox Rift","Slither Wing IR","203/182","","","",""],
+["S&V: Paradox Rift","Garbodor IR","204/182","","","",""],
+["S&V: Paradox Rift","Yveltal IR","205/182","","","",""],
+["S&V: Paradox Rift","Morpeko IR","206/182","","","",""],
+["S&V: Paradox Rift","Brute Bonnet IR","207/182","","","",""],
+["S&V: Paradox Rift","Aegislash IR","210/182","","","",""],
+["S&V: Paradox Rift","Aipom IR","211/182","","","",""],
+["S&V: Paradox Rift","Swablu IR","213/182","","","",""],
+["S&V: Paradox Rift","Porygon-Z IR","214/182","","","",""],
+["S&V: Paradox Rift","Cyclizar IR","215/182","","","",""],
+["S&V: Paradox Rift","Iron Jugulis IR","216/182","","","",""],
+["S&V: Paradox Rift","Garchomp SIR","245/182","","","",""],
+["S&V: Paradox Rift","Golisopod SIR","246/182","","","",""],
+["S&V: Paradox Rift","Tapu Koko SIR","247/182","","","",""],
+["S&V: Paradox Rift","Iron Hands SIR","248/182","","","",""],
+["S&V: Paradox Rift","Iron Valiant SIR","249/182","","","",""],
+["S&V: Paradox Rift","Sandy Shocks SIR","250/182","","","",""],
+["S&V: Paradox Rift","Roaring Moon SIR","251/182","","","",""],
+["S&V: Paradox Rift","Altaria SIR","253/182","","","",""],
+["S&V: Paldean Fates","Mew SIR (Bubble Mew)","232/91","huge","","",""],
+["S&V: Paldean Fates","IR Shinies 92-211","92-211","","","",""],
+["S&V: Paldean Fates","Gardevoir SIR","233/91","","","",""],
+["S&V: Paldean Fates","Charizard SIR","234/91","","","",""],
+["S&V: Temporal Forces","Shiftry IR","163/162","","","",""],
+["S&V: Temporal Forces","Grotle IR","164/162","","","",""],
+["S&V: Temporal Forces","Deerling IR","165/162","","","",""],
+["S&V: Temporal Forces","Sawsbuck IR","166/162","","","",""],
+["S&V: Temporal Forces","Reuniclus IR","171/162","","","",""],
+["S&V: Temporal Forces","Cutiefly IR","172/162","","","",""],
+["S&V: Temporal Forces","Relicanth IR","173/162","","","",""],
+["S&V: Temporal Forces","Excadrill IR","174/162","","","",""],
+["S&V: Temporal Forces","Mudsdale IR","175/162","","","",""],
+["S&V: Temporal Forces","Gastly IR","177/162","","","",""],
+["S&V: Temporal Forces","Metagross IR","178/162","","","",""],
+["S&V: Temporal Forces","Chatot IR","181/162","","","",""],
+["S&V: Temporal Forces","Minccino IR","182/162","","","",""],
+["S&V: Temporal Forces","Cinccino IR","183/162","","","",""],
+["S&V: Temporal Forces","Drampa IR","184/162","","","",""],
+["S&V: Temporal Forces","Iron Leaves SIR","203/162","","","",""],
+["S&V: Temporal Forces","Gouging Fire SIR","204/162","","","",""],
+["S&V: Temporal Forces","Walking Wake SIR","205/162","","","",""],
+["S&V: Temporal Forces","Iron Crown SIR","206/162","","","",""],
+["S&V: Temporal Forces","Iron Boulder SIR","207/162","","","",""],
+["S&V: Temporal Forces","Raging Bolt SIR","208/162","","","",""],
+["S&V: Twilight Masquerade","Infernape IR","173/167","huge","","",""],
+["S&V: Twilight Masquerade","Chansey IR","187/167","huge","","",""],
+["S&V: Twilight Masquerade","Pinsir IR","168/167","","","",""],
+["S&V: Twilight Masquerade","Dipplin IR","170/167","","","",""],
+["S&V: Twilight Masquerade","Torkoal IR","172/167","","","",""],
+["S&V: Twilight Masquerade","Froslass IR","174/167","","","",""],
+["S&V: Twilight Masquerade","Chimecho IR","179/167","","","",""],
+["S&V: Twilight Masquerade","Timburr IR","183/167","","","",""],
+["S&V: Twilight Masquerade","Applin IR","185/167","","","",""],
+["S&V: Twilight Masquerade","Eevee IR","188/167","","","",""],
+["S&V: Twilight Masquerade","Sinistcha SIR","210/167","","","",""],
+["S&V: Twilight Masquerade","Greninja SIR","214/167","","","",""],
+["S&V: Twilight Masquerade","Bloodmoon Ursaluna SIR","216/167","","","",""],
+["S&V: Twilight Masquerade","Lana's Aid SIR","219/167","","","",""],
+["S&V: Shrouded Fable","Tapu Bulu IR","65/64","","","",""],
+["S&V: Shrouded Fable","Houndoom IR","66/64","","","",""],
+["S&V: Shrouded Fable","Horsea IR","67/64","","","",""],
+["S&V: Shrouded Fable","Duskull IR","68/64","","","",""],
+["S&V: Shrouded Fable","Dusclops IR","69/64","","","",""],
+["S&V: Shrouded Fable","Dusknoir IR","70/64","","","",""],
+["S&V: Shrouded Fable","Cresselia IR","71/64","","","",""],
+["S&V: Shrouded Fable","Munkidori IR","72/64","","","",""],
+["S&V: Shrouded Fable","Fezandipiti IR","73/64","","","",""],
+["S&V: Shrouded Fable","Okidogi IR","74/64","","","",""],
+["S&V: Shrouded Fable","Zorua IR","75/64","","","",""],
+["S&V: Shrouded Fable","Cufant IR","76/64","","","",""],
+["S&V: Shrouded Fable","Frazure IR","77/64","","","",""],
+["S&V: Shrouded Fable","Persian IR","78/64","","","",""],
+["S&V: Shrouded Fable","Bewear IR","79/64","","","",""],
+["S&V: Shrouded Fable","Okidogi SIR","90/64","","","",""],
+["S&V: Shrouded Fable","Munkidori SIR","91/64","","","",""],
+["S&V: Shrouded Fable","Fezandipiti SIR","92/64","","","",""],
+["S&V: Shrouded Fable","Pecharunt SIR","93/64","","","",""],
+["S&V: Shrouded Fable","Cassiopeia SIR","94/64","","","",""],
+["S&V: Stellar Crown","Squirtle IR","148/142","huge","","",""],
+["S&V: Stellar Crown","Bulbasaur IR","143/142","","","",""],
+["S&V: Stellar Crown","Lileep IR","145/142","","","",""],
+["S&V: Stellar Crown","Turtonator IR","146/142","","","",""],
+["S&V: Stellar Crown","Raboot IR","147/142","","","",""],
+["S&V: Stellar Crown","Crabominable IR","149/142","","","",""],
+["S&V: Stellar Crown","Joltik IR","150/142","","","",""],
+["S&V: Stellar Crown","Zeraora IR","151/142","","","",""],
+["S&V: Stellar Crown","Milcery IR","152/142","","","",""],
+["S&V: Stellar Crown","Meditite IR","153/142","","","",""],
+["S&V: Stellar Crown","Gulpin IR","154/142","","","",""],
+["S&V: Stellar Crown","Archaludon IR","155/142","","","",""],
+["S&V: Stellar Crown","Hydrapple SIR","167/142","","","",""],
+["S&V: Stellar Crown","Galvantula SIR","168/142","","","",""],
+["S&V: Stellar Crown","Dachsbun SIR","169/142","","","",""],
+["S&V: Stellar Crown","Terapagos SIR","170/142","","","",""],
+["S&V: Surging Sparks","Latias SIR","239/250","huge","","",""],
+["S&V: Surging Sparks","Milotic SIR","237/250","","","",""],
+["S&V: Surging Sparks","Pikachu SIR","238/250","","","",""],
+["S&V: Surging Sparks","Hydreigon SIR","240/250","","","",""],
+["S&V: Prismatic Evolutions","Leafeon SIR","144/131","","","",""],
+["S&V: Prismatic Evolutions","Flareon SIR","146/131","","","",""],
+["S&V: Prismatic Evolutions","Ceruledge SIR","147/131","","","",""],
+["S&V: Prismatic Evolutions","Vaporeon SIR","149/131","","","",""],
+["S&V: Prismatic Evolutions","Glaceon SIR","150/131","","","",""],
+["S&V: Prismatic Evolutions","Palafin SIR","151/131","","","",""],
+["S&V: Prismatic Evolutions","Jolteon SIR","153/131","","","",""],
+["S&V: Prismatic Evolutions","Iron Hands SIR","154/131","","","",""],
+["S&V: Prismatic Evolutions","Espeon SIR","155/131","","","",""],
+["S&V: Prismatic Evolutions","Sylveon SIR","156/131","","","",""],
+["S&V: Prismatic Evolutions","Iron Valiant SIR","157/131","","","",""],
+["S&V: Prismatic Evolutions","Iron Crown SIR","158/131","","","",""],
+["S&V: Prismatic Evolutions","Roaring Moon SIR","162/131","","","",""],
+["S&V: Prismatic Evolutions","Pecharunt SIR","163/131","","","",""],
+["S&V: Prismatic Evolutions","Gholdengo SIR","164/131","","","",""],
+["S&V: Prismatic Evolutions","Dragapult SIR","165/131","","","",""],
+["S&V: Prismatic Evolutions","Raging Bolt SIR","166/131","","","",""],
+["S&V: Prismatic Evolutions","Eevee SIR","167/131","","","",""],
+["S&V: Prismatic Evolutions","Bloodmoon Ursaluna SIR","168/131","","","",""],
+["S&V: Prismatic Evolutions","Terapagos SIR","169/131","","","",""],
+["S&V: Journey Together","Lillie's Clefairy SIR","184/180","big","","",""],
+["S&V: Journey Together","Articuno IR","161/180","","","",""],
+["S&V: Journey Together","Wailord IR","162/180","","","",""],
+["S&V: Journey Together","Lillie's Ribombee IR","164/180","","","",""],
+["S&V: Journey Together","Hop's Wooloo IR","161/180","","","",""],
+["S&V: Journey Together","Volcanion SIR","182/180","","","",""],
+["S&V: Journey Together","Iono's Bellibolt SIR","183/180","","","",""],
+["S&V: Journey Together","N's Zoroark SIR","185/180","","","",""],
+["S&V: Journey Together","Hop's Zacian SIR","186/180","","","",""],
+["S&V: Journey Together","Salamence SIR","187/180","","","",""],
+["S&V: Destined Rivals","Team Rocket's Meowth IR","203/182","huge","","",""],
+["S&V: Destined Rivals","Team Rocket's Mewtwo SIR","231/182","huge","","",""],
+["S&V: Destined Rivals","Team Rocket's Crobat SIR","234/182","huge","","",""],
+["S&V: Destined Rivals","Yanma IR","183/182","","","",""],
+["S&V: Destined Rivals","Cynthia's Roserade IR","184/182","","","",""],
+["S&V: Destined Rivals","Shaymin IR","185/182","","","",""],
+["S&V: Destined Rivals","Rapidash IR","189/182","","","",""],
+["S&V: Destined Rivals","Ethan's Typhlosion IR","190/182","","","",""],
+["S&V: Destined Rivals","Team Rocket's Houndoom IR","191/182","","","",""],
+["S&V: Destined Rivals","Blaziken IR","192/182","","","",""],
+["S&V: Destined Rivals","Misty's Psyduck IR","193/182","","","",""],
+["S&V: Destined Rivals","Misty's Lapras IR","194/182","","","",""],
+["S&V: Destined Rivals","Clamperl IR","195/182","","","",""],
+["S&V: Destined Rivals","Electrike IR","196/182","","","",""],
+["S&V: Destined Rivals","Team Rocket's Weezing IR","199/182","","","",""],
+["S&V: Destined Rivals","Zamazenta IR","201/182","","","",""],
+["S&V: Destined Rivals","Team Rocket's Raticate IR","202/182","","","",""],
+["S&V: Destined Rivals","Team Rocket's Moltres SIR","229/182","","","",""],
+["S&V: Destined Rivals","Ethan's Ho-Oh SIR","230/182","","","",""],
+["S&V: Destined Rivals","Cynthia's Garchomp SIR","232/182","","","",""],
+["S&V: Destined Rivals","Team Rocket's Nidoking SIR","233/182","","","",""],
+["S&V: Black Bolt","Victini SIR","171/86","huge","","",""],
+["S&V: Black Bolt","Servine IR","88/86","","","",""],["S&V: Black Bolt","Pansage IR","89/86","","","",""],["S&V: Black Bolt","Semisage IR","90/86","","","",""],["S&V: Black Bolt","Petilil IR","91/86","","","",""],["S&V: Black Bolt","Lilligant IR","92/86","","","",""],["S&V: Black Bolt","Karrablast IR","94/86","","","",""],["S&V: Black Bolt","Foongus IR","95/86","","","",""],["S&V: Black Bolt","Amoonguss IR","96/86","","","",""],["S&V: Black Bolt","Darumaka IR","97/86","","","",""],["S&V: Black Bolt","Larvesta IR","99/86","","","",""],["S&V: Black Bolt","Volcarona IR","100/86","","","",""],["S&V: Black Bolt","Panpour IR","101/86","","","",""],["S&V: Black Bolt","Simipour IR","102/86","","","",""],["S&V: Black Bolt","Palpitoad IR","104/86","","","",""],["S&V: Black Bolt","Seismitoad IR","105/86","","","",""],["S&V: Black Bolt","Tirtouga IR","106/86","","","",""],["S&V: Black Bolt","Alomomola IR","108/86","","","",""],["S&V: Black Bolt","Cubchoo IR","109/86","","","",""],["S&V: Black Bolt","Beartic IR","110/86","","","",""],["S&V: Black Bolt","Cryogonal IR","111/86","","","",""],["S&V: Black Bolt","Emolga IR","112/86","","","",""],["S&V: Black Bolt","Tynamo IR","113/86","","","",""],["S&V: Black Bolt","Elektrik IR","114/86","","","",""],["S&V: Black Bolt","Elektross IR","115/86","","","",""],["S&V: Black Bolt","Munna IR","116/86","","","",""],["S&V: Black Bolt","Musharna IR","117/86","","","",""],["S&V: Black Bolt","Solosis IR","118/86","","","",""],["S&V: Black Bolt","Duosion IR","119/86","","","",""],["S&V: Black Bolt","Elgyem IR","120/86","","","",""],["S&V: Black Bolt","Beheeyem IR","121/86","","","",""],["S&V: Black Bolt","Golett IR","122/86","","","",""],["S&V: Black Bolt","Golurk IR","123/86","","","",""],["S&V: Black Bolt","Drilbur IR","124/86","","","",""],["S&V: Black Bolt","Timburr IR","125/86","","","",""],["S&V: Black Bolt","Gurdurr IR","126/86","","","",""],["S&V: Black Bolt","Throh IR","128/86","","","",""],["S&V: Black Bolt","Dwebble IR","129/86","","","",""],["S&V: Black Bolt","Crustle IR","130/86","","","",""],["S&V: Black Bolt","Landorus IR","131/86","","","",""],["S&V: Black Bolt","Venipede IR","132/86","","","",""],["S&V: Black Bolt","Whirlipede IR","133/86","","","",""],["S&V: Black Bolt","Scolipede IR","134/86","","","",""],["S&V: Black Bolt","Sandile IR","135/86","","","",""],["S&V: Black Bolt","Krokorok IR","136/86","","","",""],["S&V: Black Bolt","Krookodile IR","137/86","","","",""],["S&V: Black Bolt","Escavalier IR","138/86","","","",""],["S&V: Black Bolt","Klink IR","139/86","","","",""],["S&V: Black Bolt","Klang IR","140/86","","","",""],["S&V: Black Bolt","Klinklang IR","141/86","","","",""],["S&V: Black Bolt","Pawniard IR","142/86","","","",""],["S&V: Black Bolt","Bisharp IR","143/86","","","",""],["S&V: Black Bolt","Cobalion IR","144/86","","","",""],["S&V: Black Bolt","Axew IR","145/86","","","",""],["S&V: Black Bolt","Fraxure IR","146/86","","","",""],["S&V: Black Bolt","Haxorus IR","147/86","","","",""],["S&V: Black Bolt","Pidove IR","148/86","","","",""],["S&V: Black Bolt","Tranquill IR","149/86","","","",""],["S&V: Black Bolt","Unfezant IR","150/86","","","",""],["S&V: Black Bolt","Audino IR","151/86","","","",""],["S&V: Black Bolt","Minccino IR","152/86","","","",""],["S&V: Black Bolt","Cinccino IR","153/86","","","",""],["S&V: Black Bolt","Rufflet IR","154/86","","","",""],["S&V: Black Bolt","Braviary IR","155/86","","","",""],
+["S&V: Black Bolt","Serperior SIR","164/86","","","",""],["S&V: Black Bolt","Kyurem SIR","165/86","","","",""],["S&V: Black Bolt","Zekrom SIR","166/86","","","",""],["S&V: Black Bolt","Meloetta SIR","167/86","","","",""],["S&V: Black Bolt","Excadrill SIR","168/86","","","",""],["S&V: Black Bolt","Genesect SIR","169/86","","","",""],["S&V: Black Bolt","Zekrom SIR","172/86","","","",""],
+["S&V: White Flare","Purrloin IR","136/86","big","","",""],["S&V: White Flare","Lillipup IR","154/86","big","","",""],
+["S&V: White Flare","Swadloon IR","88/86","","","",""],["S&V: White Flare","Leavanny IR","89/86","","","",""],["S&V: White Flare","Cottonee IR","90/86","","","",""],["S&V: White Flare","Deerling IR","91/86","","","",""],["S&V: White Flare","Shelmet IR","93/86","","","",""],["S&V: White Flare","Accelgor IR","94/86","","","",""],["S&V: White Flare","Virizion IR","95/86","","","",""],["S&V: White Flare","Tepig IR","96/86","","","",""],["S&V: White Flare","Pignite IR","97/86","","","",""],["S&V: White Flare","Emboar IR","98/86","","","",""],["S&V: White Flare","Pansear IR","99/86","","","",""],["S&V: White Flare","Simisear IR","100/86","","","",""],["S&V: White Flare","Litwick IR","101/86","","","",""],["S&V: White Flare","Lampent IR","102/86","","","",""],["S&V: White Flare","Chandelure IR","103/86","","","",""],["S&V: White Flare","Heatmor IR","104/86","","","",""],["S&V: White Flare","Oshawott IR","105/86","","","",""],["S&V: White Flare","Dewott IR","106/86","","","",""],["S&V: White Flare","Ducklett IR","109/86","","","",""],["S&V: White Flare","Swanna IR","110/86","","","",""],["S&V: White Flare","Vanillite IR","111/86","","","",""],["S&V: White Flare","Vanillish IR","112/86","","","",""],["S&V: White Flare","Vanilluxe IR","113/86","","","",""],["S&V: White Flare","Blitzle IR","114/86","","","",""],["S&V: White Flare","Zebstrika IR","115/86","","","",""],["S&V: White Flare","Joltik IR","116/86","","","",""],["S&V: White Flare","Galvantula IR","117/86","","","",""],["S&V: White Flare","Stunfisk IR","118/86","","","",""],["S&V: White Flare","Woobat IR","119/86","","","",""],["S&V: White Flare","Swoobat IR","120/86","","","",""],["S&V: White Flare","Sigilyph IR","121/86","","","",""],["S&V: White Flare","Yanmask IR","122/86","","","",""],["S&V: White Flare","Cofagrigus IR","123/86","","","",""],["S&V: White Flare","Gothita IR","124/86","","","",""],["S&V: White Flare","Gothorita IR","125/86","","","",""],["S&V: White Flare","Roggenrola IR","127/86","","","",""],["S&V: White Flare","Boldore IR","128/86","","","",""],["S&V: White Flare","Gigalith IR","129/86","","","",""],["S&V: White Flare","Sawk IR","130/86","","","",""],["S&V: White Flare","Archen IR","131/86","","","",""],["S&V: White Flare","Archeops IR","132/86","","","",""],["S&V: White Flare","Mienfoo IR","133/86","","","",""],["S&V: White Flare","Mienshao IR","134/86","","","",""],["S&V: White Flare","Terrakion IR","135/86","","","",""],["S&V: White Flare","Liepard IR","137/86","","","",""],["S&V: White Flare","Scraggy IR","138/86","","","",""],["S&V: White Flare","Scrafty IR","139/86","","","",""],["S&V: White Flare","Trubbish IR","140/86","","","",""],["S&V: White Flare","Garbodor IR","141/86","","","",""],["S&V: White Flare","Zorua IR","142/86","","","",""],["S&V: White Flare","Zoroark IR","143/86","","","",""],["S&V: White Flare","Vullaby IR","144/86","","","",""],["S&V: White Flare","Mandibuzz IR","145/86","","","",""],["S&V: White Flare","Deino IR","146/86","","","",""],["S&V: White Flare","Zweilous IR","147/86","","","",""],["S&V: White Flare","Ferroseed IR","148/86","","","",""],["S&V: White Flare","Ferrothorn IR","149/86","","","",""],["S&V: White Flare","Durant IR","150/86","","","",""],["S&V: White Flare","Druddigon IR","151/86","","","",""],["S&V: White Flare","Patrat IR","152/86","","","",""],["S&V: White Flare","Watchog IR","153/86","","","",""],["S&V: White Flare","Herdier IR","155/86","","","",""],["S&V: White Flare","Stoutland IR","156/86","","","",""],
+["S&V: White Flare","Whimsicott SIR","165/86","","","",""],["S&V: White Flare","Reshiram SIR","166/86","","","",""],["S&V: White Flare","Keldeo SIR","167/86","","","",""],["S&V: White Flare","Jellicent SIR","168/86","","","",""],["S&V: White Flare","Hydreigon SIR","169/86","","","",""],["S&V: White Flare","Bouffalant SIR","170/86","","","",""],["S&V: White Flare","Victini SIR","172/86","","","",""],["S&V: White Flare","Reshiram SIR","173/86","","","",""],
+["Mega Evolution","Mega Venusaur SIR","177/132","","","",""],["Mega Evolution","Mega Gardevoir SIR","178/132","","","",""],["Mega Evolution","Mega Lucario SIR","179/132","","","",""],["Mega Evolution","Mega Absol SIR","180/132","","","",""],["Mega Evolution","Mega Latias SIR","181/132","","","",""],["Mega Evolution","Mega Khangaskhan SIR","182/132","","","",""],["Mega Evolution","Mega Gardevoir Gold SIR","187/132","","","",""],["Mega Evolution","Mega Lucario Gold SIR","188/132","","","",""],["Mega Evolution","Bulbasaur IR","133/132","","","",""],["Mega Evolution","Vulpix IR","138/132","","","",""],["Mega Evolution","Marshadow IR","146/132","","","",""],["Mega Evolution","Spiritomb IR","148/132","","","",""],["Mega Evolution","Spearow IR","151/132","","","",""],["Mega Evolution","Delibird IR","152/132","","","",""],["Mega Evolution","Stufful IR","154/132","","","",""],
+["Mega Evo: Phantasmal Flames","Mega Charizard X SIR","125/94","","","",""],["Mega Evo: Phantasmal Flames","Mega Sharpedo SIR","127/94","","","",""],["Mega Evo: Phantasmal Flames","Dawn SIR","129/94","","","",""],["Mega Evo: Phantasmal Flames","Mega Charizard X SIR","130/94","","","",""],["Mega Evo: Phantasmal Flames","Ludicolo IR","95/94","","","",""],["Mega Evo: Phantasmal Flames","Wigglytuff IR","105/94","","","",""],["Mega Evo: Phantasmal Flames","Ambipom IR","107/94","","","",""],
+["Mega Evo: Ascended Heroes","Team Rocket's Mimikyu IR","238/217","big","","",""],
+["Mega Evo: Ascended Heroes","Erika's Tangela IR","218/217","","","",""],["Mega Evo: Ascended Heroes","Dustox IR","220/217","","","",""],["Mega Evo: Ascended Heroes","Salazzle IR","224/217","","","",""],["Mega Evo: Ascended Heroes","Snorunt IR","227/217","","","",""],["Mega Evo: Ascended Heroes","Weavile IR","228/217","","","",""],["Mega Evo: Ascended Heroes","Iono's Wattrel IR","231/217","","","",""],["Mega Evo: Ascended Heroes","Marill IR","232/217","","","",""],["Mega Evo: Ascended Heroes","Misdreavus IR","233/217","","","",""],["Mega Evo: Ascended Heroes","Banette IR","234/217","","","",""],["Mega Evo: Ascended Heroes","Hop's Trevenant IR","237/217","","","",""],["Mega Evo: Ascended Heroes","Team Rocket's Dugtrio IR","239/217","","","",""],["Mega Evo: Ascended Heroes","Hitmontop IR","240/217","","","",""],["Mega Evo: Ascended Heroes","Carbink IR","242/217","","","",""],["Mega Evo: Ascended Heroes","Mightyena IR","243/217","","","",""],["Mega Evo: Ascended Heroes","Cynthia's Spiritomb IR","244/217","","","",""],["Mega Evo: Ascended Heroes","Galarian Obstagoon IR","245/217","","","",""],["Mega Evo: Ascended Heroes","Mawile IR","246/217","","","",""],["Mega Evo: Ascended Heroes","Dreepy IR","247/217","","","",""],["Mega Evo: Ascended Heroes","Drakloak IR","248/217","","","",""],["Mega Evo: Ascended Heroes","Larry's Staraptor IR","249/217","","","",""],
+["Mega Evo: Ascended Heroes","Mega Froslass SIR","265/217","","","",""],["Mega Evo: Ascended Heroes","Mega Eelektross SIR","266/217","","","",""],["Mega Evo: Ascended Heroes","Mega Diancie SIR","267/217","","","",""],["Mega Evo: Ascended Heroes","Mega Hawlucha SIR","268/217","","","",""],["Mega Evo: Ascended Heroes","Mega Gengar SIR","269/217","","","",""],["Mega Evo: Ascended Heroes","Mega Scrafty SIR","270/217","","","",""],["Mega Evo: Ascended Heroes","Mega Dragonite SIR","271/217","","","",""],["Mega Evo: Ascended Heroes","Mega Meganium SIR","272/217","","","",""],["Mega Evo: Ascended Heroes","Mega Emboar SIR","273/217","","","",""],["Mega Evo: Ascended Heroes","Mega Feraligatr SIR","274/217","","","",""],["Mega Evo: Ascended Heroes","Mega Froslass SIR","275/217","","","",""],["Mega Evo: Ascended Heroes","Pikachu SIR","276/217","","","",""],["Mega Evo: Ascended Heroes","Pikachu SIR","277/217","","","",""],["Mega Evo: Ascended Heroes","Mega Eelektross SIR","278/217","","","",""],["Mega Evo: Ascended Heroes","Iono's Bellibolt SIR","279/217","","","",""],["Mega Evo: Ascended Heroes","Lillie's Clefairy SIR","280/217","","","",""],["Mega Evo: Ascended Heroes","Team Rocket's Mewtwo SIR","281/217","","","",""],["Mega Evo: Ascended Heroes","Mega Diancie SIR","282/217","","","",""],["Mega Evo: Ascended Heroes","Mega Hawlucha SIR","283/217","","","",""],["Mega Evo: Ascended Heroes","Mega Gengar SIR","284/217","","","",""],["Mega Evo: Ascended Heroes","Mega Scrafty SIR","285/217","","","",""],["Mega Evo: Ascended Heroes","N's Zoroark SIR","286/217","","","",""],["Mega Evo: Ascended Heroes","Marnie's Grimmsnarl SIR","287/217","","","",""],["Mega Evo: Ascended Heroes","Fezandipiti SIR","288/217","","","",""],["Mega Evo: Ascended Heroes","Steven's Metagross SIR","289/217","","","",""],["Mega Evo: Ascended Heroes","Mega Charizard Y SIR","289/217","","","",""],["Mega Evo: Ascended Heroes","Mega Dragonite SIR","290/217","","","",""],
+["Mega Evo: Perfect Order","Mega Starmie SIR","118/88","","","",""],["Mega Evo: Perfect Order","Mega Clefable SIR","119/88","","","",""],["Mega Evo: Perfect Order","Meowth SIR","121/88","","","",""],["Mega Evo: Perfect Order","Mega Zygarde SIR","124/88","","","",""],
+];
+
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let cards=[], owned={}, shows=[], lightTheme=false;
+let tTab='all', pTab='all', cTab='all';
+let lbIdx=null, lbList=[], lbListPos=0;
+let editingIdx=null, editingEra=null, editingShowId=null;
+
+const PRI_ORDER={huge:0,big:1,need:2,'':3,low:4};
+const COND_ORDER={NM:0,LP:1,MP:2,HP:3,DMG:4};
+
+// ═══════════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════════
+function load(){
+  try{
+    const c=localStorage.getItem('pkv4_cards');
+    cards=c?JSON.parse(c):JSON.parse(JSON.stringify(DEFAULT_CARDS));
+    cards=cards.map(r=>{while(r.length<7)r.push('');return r;});
+    const o=localStorage.getItem('pkv4_owned');
+    owned=o?JSON.parse(o):{};
+    const s=localStorage.getItem('pkv4_shows');
+    shows=s?JSON.parse(s):[];
+    const t=localStorage.getItem('pkv4_theme');
+    lightTheme=t==='light';
+    if(lightTheme)document.body.classList.add('light');
+    updateThemeToggle();
+  }catch(e){cards=JSON.parse(JSON.stringify(DEFAULT_CARDS));owned={};shows=[];}
+}
+function saveCards(){try{localStorage.setItem('pkv4_cards',JSON.stringify(cards));}catch(e){}}
+function saveOwned(){try{localStorage.setItem('pkv4_owned',JSON.stringify(owned));}catch(e){}}
+function saveShows(){try{localStorage.setItem('pkv4_shows',JSON.stringify(shows));}catch(e){}}
+function ckey(r){return r[0]+'|||'+r[1]+'|||'+r[2];}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function $fmt(v){if(!v&&v!==0)return'—';return '$'+parseFloat(v).toFixed(2);}
+function isOwned(r){return!!owned[ckey(r)];}
+function getOwned(r){return owned[ckey(r)]||null;}
+function needsUpgrade(r){const o=getOwned(r);return o&&o.upgradeFlag;}
+function condClass(c){return c?'cond-'+c:'';}
+
+function sortArr(arr,mode){
+  const a=[...arr];
+  if(mode==='alpha')return a.sort((x,y)=>x[1].localeCompare(y[1]));
+  if(mode==='priority')return a.sort((x,y)=>(PRI_ORDER[x[3]]??3)-(PRI_ORDER[y[3]]??3));
+  if(mode==='num')return a.sort((x,y)=>(parseInt(x[2])||0)-(parseInt(y[2])||0));
+  if(mode==='value'){
+    return a.sort((x,y)=>{
+      const ov=parseFloat(getOwned(y)?.marketValue||0);
+      const xv=parseFloat(getOwned(x)?.marketValue||0);
+      return ov-xv;
+    });
+  }
+  return a;
+}
+
+function formatDate(d){
+  if(!d)return'';
+  try{const dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+  catch(e){return d;}
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════════
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  const renders={tracker:renderTracker,preview:renderPreview,collection:renderCollection,stats:renderStats,log:renderLog,manage:renderManage};
+  if(renders[id])renders[id]();
+}
+
+function setTab(page,val,el){
+  if(page==='t')tTab=val;
+  else if(page==='p')pTab=val;
+  else if(page==='c')cTab=val;
+  const parent=el.closest('.pill-row');
+  parent.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(page==='t')renderTracker();
+  else if(page==='p')renderPreview();
+  else if(page==='c')renderCollection();
+}
+
+function clrSearch(id){document.getElementById(id).value='';if(id==='t-search')renderTracker();else if(id==='p-search')renderPreview();else if(id==='c-search')renderCollection();}
+
+// ═══════════════════════════════════════════════════════
+//  TRACKER
+// ═══════════════════════════════════════════════════════
+function getTrackerFiltered(){
+  const q=document.getElementById('t-search').value.toLowerCase().trim();
+  const era=document.getElementById('t-era').value;
+  const cond=document.getElementById('t-cond').value;
+  return cards.filter(r=>{
+    if(era&&r[0]!==era)return false;
+    if(q&&!r[1].toLowerCase().includes(q)&&!r[0].toLowerCase().includes(q)&&!r[2].includes(q))return false;
+    const o=getOwned(r);
+    if(cond==='upgrade')return needsUpgrade(r);
+    if(cond==='NM')return o&&o.condition==='NM';
+    if(tTab==='wants')return!isOwned(r);
+    if(tTab==='huge')return r[3]==='huge';
+    if(tTab==='big')return r[3]==='huge'||r[3]==='big';
+    if(tTab==='need')return r[3]==='need';
+    if(tTab==='owned')return isOwned(r);
+    if(tTab==='upgrade')return needsUpgrade(r);
+    if(tTab==='img')return!!r[4];
+    if(tTab==='target')return!!r[5]&&parseFloat(r[5])>0;
+    return true;
+  });
+}
+
+function renderTracker(){
+  // update stats
+  const total=cards.length;
+  const ownedCount=cards.filter(isOwned).length;
+  const left=total-ownedCount;
+  const pct=total?Math.round(ownedCount/total*100):0;
+  const totalVal=Object.values(owned).reduce((s,o)=>s+(parseFloat(o.marketValue)||0),0);
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-owned').textContent=ownedCount;
+  document.getElementById('st-left').textContent=left;
+  document.getElementById('st-pct').textContent=pct+'%';
+  document.getElementById('st-val').textContent='$'+Math.round(totalVal);
+  document.getElementById('t-progress').style.width=pct+'%';
+
+  const mode=document.getElementById('t-sort').value;
+  let filtered=getTrackerFiltered();
+  const list=document.getElementById('tracker-list');
+  if(!filtered.length){list.innerHTML='<div class="empty">No cards match your filters</div>';return;}
+
+  if(mode!=='set'){
+    const sorted=sortArr(filtered,mode);
+    list.innerHTML=`<div class="era-group"><div class="era-hdr"><span class="era-name">${sorted.length} result${sorted.length!==1?'s':''}</span></div>${sorted.map((r,i)=>cardRowHTML(r,cards.indexOf(r))).join('')}</div>`;
+    return;
+  }
+  const grp={};
+  filtered.forEach(r=>{if(!grp[r[0]])grp[r[0]]=[];grp[r[0]].push(r);});
+  list.innerHTML=Object.entries(grp).map(([era,rows])=>{
+    const eLeft=rows.filter(r=>!isOwned(r)).length;
+    return`<div class="era-group"><div class="era-hdr"><span class="era-name">${era}</span><span class="era-count">${eLeft} left</span></div>${rows.map(r=>cardRowHTML(r,cards.indexOf(r))).join('')}</div>`;
+  }).join('');
+}
+
+function cardRowHTML(r,idx){
+  const o=getOwned(r);
+  const isOwnedFlag=!!o;
+  const upgrade=needsUpgrade(r);
+  const pri=r[3]||'';
+  const img=r[4]||'';
+  const target=r[5]?parseFloat(r[5]):0;
+  const mv=o?parseFloat(o.marketValue||0):0;
+  const badgeMap={huge:'cb-huge',big:'cb-big',need:'cb-need',low:'cb-low'};
+  const badgeLbl={huge:'🔥',big:'⭐',need:'📌',low:'🔎'};
+  return`<div class="crd-row${isOwnedFlag?' owned':''}${upgrade?' upgrade-flag':''}" onclick="toggleOwned(${idx})">
+    ${img?`<img class="cthumb" src="${img}" alt="" loading="lazy" onerror="this.style.display='none'"/>`:`<div class="cthumb-ph">🃏</div>`}
+    <div class="chkbox"><span class="chk-ico">✓</span></div>
+    <div class="cinfo">
+      <div class="cname">${r[1]}</div>
+      <div class="csub">
+        <span>${r[2]}</span>
+        ${pri&&badgeMap[pri]?`<span class="cbadge ${badgeMap[pri]}">${badgeLbl[pri]}</span>`:''}
+        ${o&&o.condition?`<span class="cbadge cb-cond ${condClass(o.condition)}">${o.condition}</span>`:''}
+        ${upgrade?`<span class="cbadge cb-upgrade">↑upg</span>`:''}
+        ${mv>0?`<span class="price-tag">${$fmt(mv)}</span>`:''}
+        ${target>0&&!isOwnedFlag?`<span style="font-size:9px;color:var(--amber);">🎯${$fmt(target)}</span>`:''}
+      </div>
+      ${r[6]?`<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${r[6]}</div>`:''}
+    </div>
+    <div class="cactions">
+      ${img?`<button class="ico-btn" onclick="event.stopPropagation();openLB(${idx},null)">🔍</button>`:''}
+      <button class="ico-btn" onclick="event.stopPropagation();openEditCard(${idx})">✏️</button>
+    </div>
+  </div>`;
+}
+
+function toggleOwned(idx){
+  const r=cards[idx];
+  const k=ckey(r);
+  if(owned[k]){delete owned[k];}
+  else{
+    owned[k]={condition:'NM',pricePaid:'',marketValue:'',acquiredAt:'',acquiredDate:new Date().toISOString().slice(0,10),upgradeFlag:false};
+  }
+  saveOwned();renderTracker();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PREVIEW
+// ═══════════════════════════════════════════════════════
+function renderPreview(){
+  const q=document.getElementById('p-search').value.toLowerCase().trim();
+  const mode=document.getElementById('p-sort').value;
+  let filtered=cards.filter(r=>{
+    if(q&&!r[1].toLowerCase().includes(q)&&!r[0].toLowerCase().includes(q))return false;
+    if(pTab==='wants')return!isOwned(r);
+    if(pTab==='owned')return isOwned(r);
+    if(pTab==='huge')return r[3]==='huge';
+    if(pTab==='img')return!!r[4];
+    if(pTab==='upgrade')return needsUpgrade(r);
+    return true;
+  });
+  filtered=sortArr(filtered,mode);
+  lbList=filtered;
+  const priColors={huge:'var(--red)',big:'var(--amber)',need:'var(--blue)',low:'var(--muted)'};
+  const priLabels={huge:'🔥 Huge',big:'⭐ Big',need:'📌 Need',low:'🔎 Low'};
+  const grid=document.getElementById('preview-grid');
+  if(!filtered.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1">No cards found</div>';return;}
+  grid.innerHTML=filtered.map((r,i)=>{
+    const o=isOwned(r);
+    const upg=needsUpgrade(r);
+    const img=r[4]||'';
+    const pri=r[3]||'';
+    return`<div class="prev-card${o?' owned':''}${upg?' upgrade':''}" data-li="${i}">
+      ${o?`<div class="prev-owned-badge">✓</div>`:''}
+      ${upg?`<div class="prev-upgrade-badge">↑ Upgrade</div>`:''}
+      ${pri&&priLabels[pri]?`<div class="prev-badge" style="background:rgba(0,0,0,.75);color:${priColors[pri]||'var(--muted)'}">${priLabels[pri]}</div>`:''}
+      ${img
+        ?`<img class="prev-img" src="${img}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="prev-img-ph" style="display:none">🃏</div>`
+        :`<div class="prev-img-ph">🃏</div>`}
+      <div class="prev-info">
+        <div class="prev-name">${r[1]}</div>
+        <div class="prev-set">${r[0]}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.prev-card').forEach(el=>{
+    const i=parseInt(el.dataset.li);
+    el.onclick=()=>openLBFromList(i);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  COLLECTION
+// ═══════════════════════════════════════════════════════
+function renderCollection(){
+  const q=document.getElementById('c-search').value.toLowerCase().trim();
+  const mode=document.getElementById('c-sort').value;
+  let ownedCards=cards.filter(r=>{
+    if(!isOwned(r))return false;
+    if(q&&!r[1].toLowerCase().includes(q)&&!r[0].toLowerCase().includes(q))return false;
+    const o=getOwned(r);
+    if(cTab==='upgrade')return needsUpgrade(r);
+    if(cTab==='nm')return o&&o.condition==='NM';
+    if(cTab==='lp')return o&&o.condition==='LP';
+    if(cTab==='mp')return o&&(o.condition==='MP'||o.condition==='HP');
+    return true;
+  });
+  // sort
+  if(mode==='alpha')ownedCards.sort((a,b)=>a[1].localeCompare(b[1]));
+  else if(mode==='recent')ownedCards.sort((a,b)=>{
+    const da=getOwned(a)?.acquiredDate||'';
+    const db=getOwned(b)?.acquiredDate||'';
+    return db.localeCompare(da);
+  });
+  else if(mode==='value')ownedCards.sort((a,b)=>(parseFloat(getOwned(b)?.marketValue||0))-(parseFloat(getOwned(a)?.marketValue||0)));
+  else if(mode==='paid')ownedCards.sort((a,b)=>(parseFloat(getOwned(b)?.pricePaid||0))-(parseFloat(getOwned(a)?.pricePaid||0)));
+  else if(mode==='pnl')ownedCards.sort((a,b)=>{
+    const pnlA=(parseFloat(getOwned(a)?.marketValue||0))-(parseFloat(getOwned(a)?.pricePaid||0));
+    const pnlB=(parseFloat(getOwned(b)?.marketValue||0))-(parseFloat(getOwned(b)?.pricePaid||0));
+    return pnlB-pnlA;
+  });
+
+  const list=document.getElementById('collection-list');
+  if(!ownedCards.length){
+    list.innerHTML=`<div class="empty">${cards.filter(isOwned).length===0?'No cards owned yet — tap a card in Tracker to mark it owned!':'No cards match this filter.'}</div>`;
+    return;
+  }
+
+  list.innerHTML=ownedCards.map(r=>{
+    const o=getOwned(r);
+    const idx=cards.indexOf(r);
+    const paid=parseFloat(o.pricePaid||0);
+    const mv=parseFloat(o.marketValue||0);
+    const pnl=mv-paid;
+    const pnlClass=pnl>0?'pos':pnl<0?'neg':'zero';
+    const img=r[4]||'';
+    return`<div class="coll-card" onclick="openEditCard(${idx})">
+      <div class="coll-card-top">
+        ${img?`<img class="coll-img" src="${img}" alt="" loading="lazy" onerror="this.style.display='none'"/>`:`<div class="coll-img-ph">🃏</div>`}
+        <div class="coll-info">
+          <div class="coll-name">${r[1]}</div>
+          <div class="coll-set">${r[0]} · ${r[2]}</div>
+          <div class="coll-meta">
+            ${o.condition?`<span class="coll-pill ${o.condition==='NM'?'green':o.condition==='LP'?'teal':o.condition==='MP'||o.condition==='HP'?'amber':'red'}">${o.condition}</span>`:''}
+            ${paid>0?`<span class="coll-pill">Paid: ${$fmt(paid)}</span>`:''}
+            ${mv>0?`<span class="coll-pill teal">Value: ${$fmt(mv)}</span>`:''}
+            ${paid>0&&mv>0?`<span class="pnl ${pnlClass}">${pnl>=0?'+':''}${$fmt(pnl)}</span>`:''}
+            ${o.upgradeFlag?`<span class="coll-pill amber">↑ Upgrade</span>`:''}
+          </div>
+          ${o.acquiredAt?`<div style="font-size:10px;color:var(--muted);margin-top:4px;">📍 ${o.acquiredAt}${o.acquiredDate?' · '+formatDate(o.acquiredDate):''}</div>`:''}
+          ${o.acquiredDate&&!o.acquiredAt?`<div style="font-size:10px;color:var(--muted);margin-top:4px;">📅 ${formatDate(o.acquiredDate)}</div>`:''}
+        </div>
+      </div>
+      ${r[6]?`<div class="coll-note">${r[6]}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════
+function renderStats(){
+  const ownedCards=cards.filter(isOwned);
+  const total=cards.length, ownedN=ownedCards.length;
+  const totalPaid=ownedCards.reduce((s,r)=>s+(parseFloat(getOwned(r)?.pricePaid||0)),0);
+  const totalMV=ownedCards.reduce((s,r)=>s+(parseFloat(getOwned(r)?.marketValue||0)),0);
+  const pnl=totalMV-totalPaid;
+  const upgrades=ownedCards.filter(needsUpgrade).length;
+  const withPhotos=cards.filter(r=>!!r[4]).length;
+
+  // era completion
+  const eras=[...new Set(cards.map(r=>r[0]))];
+  const eraData=eras.map(e=>{
+    const eCards=cards.filter(r=>r[0]===e);
+    const eOwned=eCards.filter(isOwned).length;
+    return{name:e,total:eCards.length,owned:eOwned,pct:Math.round(eOwned/eCards.length*100)};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  // top value cards
+  const topVal=[...ownedCards].sort((a,b)=>(parseFloat(getOwned(b)?.marketValue||0))-(parseFloat(getOwned(a)?.marketValue||0))).slice(0,5);
+
+  // condition breakdown
+  const condCount={NM:0,LP:0,MP:0,HP:0,DMG:0};
+  ownedCards.forEach(r=>{const c=getOwned(r)?.condition||'NM';if(condCount[c]!==undefined)condCount[c]++;});
+
+  const body=document.getElementById('stats-body');
+  body.innerHTML=`
+    <div class="stats-section">
+      <div class="stats-sec-title">Overview</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-val">${ownedN}<span style="font-size:14px;color:var(--muted);">/${total}</span></div><div class="kpi-label">Cards owned</div></div>
+        <div class="kpi"><div class="kpi-val">${Math.round(ownedN/total*100)}%</div><div class="kpi-label">Completion</div></div>
+        <div class="kpi"><div class="kpi-val teal">${totalMV>0?$fmt(totalMV):'$0'}</div><div class="kpi-label">Collection value</div></div>
+        <div class="kpi"><div class="kpi-val ${pnl>=0?'green':'red'}">${pnl>=0?'+':''}${totalPaid>0?$fmt(pnl):'—'}</div><div class="kpi-label">Total P&L</div></div>
+        <div class="kpi"><div class="kpi-val">${totalPaid>0?$fmt(totalPaid):'$0'}</div><div class="kpi-label">Total spent</div></div>
+        <div class="kpi"><div class="kpi-val">${upgrades}</div><div class="kpi-label">Need upgrade</div></div>
+        <div class="kpi"><div class="kpi-val">${withPhotos}</div><div class="kpi-label">Cards with photo</div></div>
+        <div class="kpi"><div class="kpi-val">${shows.length}</div><div class="kpi-label">Shows attended</div></div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-sec-title">Condition Breakdown</div>
+      <div class="kpi-grid">
+        ${Object.entries(condCount).map(([c,n])=>`<div class="kpi"><div class="kpi-val ${condClass(c)}">${n}</div><div class="kpi-label">${c}</div></div>`).join('')}
+      </div>
+    </div>
+
+    ${topVal.length?`
+    <div class="stats-section">
+      <div class="stats-sec-title">Top 5 by Market Value</div>
+      ${topVal.map((r,i)=>{
+        const mv=parseFloat(getOwned(r)?.marketValue||0);
+        return`<div class="top-card-row">
+          <div class="tc-rank">#${i+1}</div>
+          <div class="tc-info"><div class="tc-name">${r[1]}</div><div class="tc-set">${r[0]}</div></div>
+          <div class="tc-val">${$fmt(mv)}</div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+
+    <div class="stats-section">
+      <div class="stats-sec-title">Completion by Set</div>
+      ${eraData.map(e=>`
+        <div class="era-progress-row">
+          <div class="ep-name" title="${e.name}">${e.name}</div>
+          <div class="ep-bar"><div class="ep-fill" style="width:${e.pct}%"></div></div>
+          <div class="ep-pct">${e.pct}%</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SHOW LOG
+// ═══════════════════════════════════════════════════════
+function renderLog(){
+  const list=document.getElementById('log-list');
+  if(!shows.length){
+    list.innerHTML='<div class="empty">No shows logged yet.<br>Tap "+ Log Show" to add your first show!</div>';
+    return;
+  }
+  const sorted=[...shows].sort((a,b)=>b.date.localeCompare(a.date));
+  list.innerHTML=sorted.map(s=>`
+    <div class="log-entry" onclick="openEditShow('${s.id}')">
+      <div class="log-top">
+        <div>
+          <div class="log-venue">${s.venue}</div>
+          <div class="log-date">${formatDate(s.date)}${s.location?' · '+s.location:''}</div>
+        </div>
+        ${s.spent?`<div style="font-size:14px;font-weight:700;color:var(--accent);">${$fmt(s.spent)}</div>`:''}
+      </div>
+      <div class="log-meta">
+        ${s.cards&&s.cards.length?`<div class="log-stat"><span>${s.cards.length}</span> card${s.cards.length!==1?'s':''} bought</div>`:''}
+        ${s.notes?`<div class="log-stat" style="color:var(--muted);">${s.notes}</div>`:''}
+      </div>
+      ${s.cards&&s.cards.length?`<div class="log-cards-preview">${s.cards.slice(0,4).map(c=>`<div class="log-card-chip">${c}</div>`).join('')}${s.cards.length>4?`<div class="log-card-chip">+${s.cards.length-4} more</div>`:''}</div>`:''}
+    </div>
+  `).join('');
+}
+
+function openAddShow(){
+  editingShowId=null;
+  document.getElementById('ms-title').textContent='Log a Show';
+  document.getElementById('ms-delete').style.display='none';
+  document.getElementById('ms-venue').value='';
+  document.getElementById('ms-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ms-loc').value='';
+  document.getElementById('ms-spent').value='';
+  document.getElementById('ms-cards').value='';
+  document.getElementById('ms-notes').value='';
+  openModal('modal-show');
+}
+function openEditShow(id){
+  const s=shows.find(x=>x.id===id);if(!s)return;
+  editingShowId=id;
+  document.getElementById('ms-title').textContent='Edit Show';
+  document.getElementById('ms-delete').style.display='block';
+  document.getElementById('ms-venue').value=s.venue||'';
+  document.getElementById('ms-date').value=s.date||'';
+  document.getElementById('ms-loc').value=s.location||'';
+  document.getElementById('ms-spent').value=s.spent||'';
+  document.getElementById('ms-cards').value=(s.cards||[]).join(', ');
+  document.getElementById('ms-notes').value=s.notes||'';
+  openModal('modal-show');
+}
+function saveShow(){
+  const venue=document.getElementById('ms-venue').value.trim();
+  if(!venue){toast('Venue name required');return;}
+  const cardsRaw=document.getElementById('ms-cards').value.trim();
+  const cardsArr=cardsRaw?cardsRaw.split(',').map(c=>c.trim()).filter(Boolean):[];
+  const entry={
+    id:editingShowId||('show_'+Date.now()),
+    venue,
+    date:document.getElementById('ms-date').value,
+    location:document.getElementById('ms-loc').value.trim(),
+    spent:document.getElementById('ms-spent').value||'',
+    cards:cardsArr,
+    notes:document.getElementById('ms-notes').value.trim()
+  };
+  if(editingShowId){const i=shows.findIndex(x=>x.id===editingShowId);if(i>=0)shows[i]=entry;}
+  else shows.push(entry);
+  saveShows();renderLog();closeModal('modal-show');
+  toast(editingShowId?'Show updated':'Show logged ✓');
+}
+function deleteShow(){
+  if(!editingShowId)return;
+  shows=shows.filter(x=>x.id!==editingShowId);
+  saveShows();renderLog();closeModal('modal-show');toast('Show deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+//  LIGHTBOX
+// ═══════════════════════════════════════════════════════
+function openLB(cardIdx,listPos){
+  lbIdx=cardIdx;
+  if(listPos!==null){lbListPos=listPos;}
+  showLB();
+}
+function openLBFromList(pos){
+  lbListPos=pos;
+  lbIdx=cards.indexOf(lbList[pos]);
+  showLB();
+}
+function showLB(){
+  const r=cards[lbIdx];
+  if(!r)return;
+  const lb=document.getElementById('lightbox');
+  lb.classList.remove('hidden');
+  lb.scrollTop=0;
+  const img=r[4]||'';
+  document.getElementById('lb-img-wrap').innerHTML=img
+    ?`<img class="lb-img" src="${img}" alt="" onerror="this.outerHTML='<div class=\\'lb-no-img\\'><span style=\\'font-size:40px\\'>🃏</span><span>No image</span></div>'"/>`
+    :`<div class="lb-no-img"><span style="font-size:40px;">🃏</span><span>No image saved</span><button onclick="openEditCard(${lbIdx})" style="margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:12px;padding:5px 14px;cursor:pointer;font-family:var(--font);">Add image URL</button></div>`;
+  document.getElementById('lb-name').textContent=r[1];
+  document.getElementById('lb-sub').textContent=r[0]+' · '+r[2];
+  const o=getOwned(r);
+  const priLabels={huge:'🔥 Huge Want',big:'⭐ Big Want',need:'📌 Need',low:'🔎 Low'};
+  const details=[];
+  if(r[3]&&priLabels[r[3]])details.push(`<span class="lb-detail-pill">${priLabels[r[3]]}</span>`);
+  if(o&&o.condition)details.push(`<span class="lb-detail-pill ${condClass(o.condition)}">${o.condition}</span>`);
+  if(r[5]&&parseFloat(r[5])>0)details.push(`<span class="lb-detail-pill" style="color:var(--amber);">🎯 Target: ${$fmt(r[5])}</span>`);
+  document.getElementById('lb-details').innerHTML=details.join('');
+  const ownedFlag=!!o;
+  document.getElementById('lb-actions').innerHTML=`
+    <button class="lb-btn ${ownedFlag?'green':''}" onclick="toggleOwned(${lbIdx});showLB()">${ownedFlag?'✓ Owned':'Mark Owned'}</button>
+    <button class="lb-btn" onclick="openEditCard(${lbIdx})">✏️ Edit</button>
+    ${o&&o.upgradeFlag?'<button class="lb-btn" style="color:var(--amber);">↑ Upgrade Flag</button>':''}
+  `;
+  if(o&&(o.pricePaid||o.marketValue||o.acquiredAt||o.acquiredDate)){
+    const paid=parseFloat(o.pricePaid||0);
+    const mv=parseFloat(o.marketValue||0);
+    const pnl=mv-paid;
+    document.getElementById('lb-price-section').style.display='block';
+    document.getElementById('lb-price-section').innerHTML=`
+      ${paid>0?`<div class="lb-price-row"><span class="lb-price-label">Paid</span><span class="lb-price-val">${$fmt(paid)}</span></div>`:''}
+      ${mv>0?`<div class="lb-price-row"><span class="lb-price-label">Market Value</span><span class="lb-price-val teal">${$fmt(mv)}</span></div>`:''}
+      ${paid>0&&mv>0?`<div class="lb-price-row"><span class="lb-price-label">P&L</span><span class="lb-price-val ${pnl>=0?'green':'red'}">${pnl>=0?'+':''}${$fmt(pnl)}</span></div>`:''}
+      ${o.acquiredAt?`<div class="lb-price-row"><span class="lb-price-label">Acquired at</span><span class="lb-price-val" style="font-size:11px;">${o.acquiredAt}</span></div>`:''}
+      ${o.acquiredDate?`<div class="lb-price-row"><span class="lb-price-label">Date</span><span class="lb-price-val" style="font-size:11px;">${formatDate(o.acquiredDate)}</span></div>`:''}
+    `;
+  }else{document.getElementById('lb-price-section').style.display='none';}
+  document.getElementById('lb-note').textContent=r[6]||'';
+}
+function closeLB(){document.getElementById('lightbox').classList.add('hidden');}
+function lbNav(dir){
+  const newPos=lbListPos+dir;
+  if(newPos<0||newPos>=lbList.length)return;
+  lbListPos=newPos;
+  lbIdx=cards.indexOf(lbList[newPos]);
+  showLB();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CARD MODAL
+// ═══════════════════════════════════════════════════════
+function populateEraSelect(selId,selected){
+  const eras=[...new Set(cards.map(r=>r[0]))];
+  document.getElementById(selId).innerHTML=eras.map(e=>`<option value="${e}"${e===selected?' selected':''}>${e}</option>`).join('');
+}
+function openAddCard(){
+  editingIdx=null;
+  document.getElementById('mc-title').textContent='Add Card';
+  document.getElementById('mc-delete').style.display='none';
+  document.getElementById('mc-owned-section').style.display='none';
+  populateEraSelect('mc-era','');
+  ['mc-name','mc-num','mc-img','mc-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mc-target').value='';
+  document.getElementById('img-prev-wrap').style.display='none';
+  setPri('pri-grp','');
+  document.getElementById('dup-warn').classList.remove('show');
+  openModal('modal-card');
+}
+function openEditCard(idx){
+  editingIdx=idx;
+  const r=cards[idx];
+  const o=getOwned(r);
+  document.getElementById('mc-title').textContent='Edit Card';
+  document.getElementById('mc-delete').style.display='block';
+  populateEraSelect('mc-era',r[0]);
+  document.getElementById('mc-name').value=r[1];
+  document.getElementById('mc-num').value=r[2];
+  document.getElementById('mc-img').value=r[4]||'';
+  document.getElementById('mc-target').value=r[5]||'';
+  document.getElementById('mc-notes').value=r[6]||'';
+  setPri('pri-grp',r[3]||'');
+  prevImg();
+  if(o){
+    document.getElementById('mc-owned-section').style.display='block';
+    document.getElementById('mc-cond').value=o.condition||'NM';
+    document.getElementById('mc-paid').value=o.pricePaid||'';
+    document.getElementById('mc-mktval').value=o.marketValue||'';
+    document.getElementById('mc-venue').value=o.acquiredAt||'';
+    document.getElementById('mc-date').value=o.acquiredDate||'';
+    document.getElementById('mc-upgrade').checked=!!o.upgradeFlag;
+  }else{
+    document.getElementById('mc-owned-section').style.display='none';
+  }
+  document.getElementById('dup-warn').classList.remove('show');
+  openModal('modal-card');
+  closeLB();
+}
+function setPri(grpId,val){
+  document.querySelectorAll(`#${grpId} .radio-opt`).forEach(el=>{el.classList.toggle('sel',el.querySelector('input').value===val);});
+}
+function getPri(grpId){
+  const s=document.querySelector(`#${grpId} .radio-opt.sel`);
+  return s?s.querySelector('input').value:'';
+}
+document.querySelectorAll('#pri-grp .radio-opt,#bulk-pri-grp .radio-opt').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const grp=el.closest('.radio-grp');
+    grp.querySelectorAll('.radio-opt').forEach(e=>e.classList.remove('sel'));
+    el.classList.add('sel');
+  });
+});
+function prevImg(){
+  const url=document.getElementById('mc-img').value.trim();
+  const wrap=document.getElementById('img-prev-wrap');
+  if(url){wrap.style.display='flex';document.getElementById('img-prev-thumb').src=url;}
+  else wrap.style.display='none';
+}
+function checkDuplicate(){
+  const name=document.getElementById('mc-name').value.toLowerCase().trim();
+  if(!name||editingIdx!==null){document.getElementById('dup-warn').classList.remove('show');return;}
+  const dup=cards.find(r=>r[1].toLowerCase()===name);
+  if(dup){
+    document.getElementById('dup-name').textContent=dup[0]+' — '+dup[1]+' ('+dup[2]+')';
+    document.getElementById('dup-warn').classList.add('show');
+  }else document.getElementById('dup-warn').classList.remove('show');
+}
+function saveCard(){
+  const era=document.getElementById('mc-era').value.trim();
+  const name=document.getElementById('mc-name').value.trim();
+  const num=document.getElementById('mc-num').value.trim();
+  const pri=getPri('pri-grp');
+  const img=document.getElementById('mc-img').value.trim();
+  const target=document.getElementById('mc-target').value||'';
+  const notes=document.getElementById('mc-notes').value.trim();
+  if(!era||!name){toast('Name and set required');return;}
+  const entry=[era,name,num||'—',pri,img,target,notes];
+  let oldKey=null;
+  if(editingIdx!==null){
+    oldKey=ckey(cards[editingIdx]);
+    cards[editingIdx]=entry;
+  }else cards.push(entry);
+  // update owned data if section was visible
+  if(document.getElementById('mc-owned-section').style.display!=='none'||isOwned({0:era,1:name,2:num||'—'})){
+    const k=ckey({0:era,1:name,2:num||'—'})||ckey(entry);
+    const existOwned=oldKey?owned[oldKey]:owned[ckey(entry)];
+    if(existOwned||oldKey){
+      if(oldKey&&oldKey!==ckey(entry)){delete owned[oldKey];}
+      owned[ckey(entry)]={
+        condition:document.getElementById('mc-cond').value||'NM',
+        pricePaid:document.getElementById('mc-paid').value||'',
+        marketValue:document.getElementById('mc-mktval').value||'',
+        acquiredAt:document.getElementById('mc-venue').value.trim(),
+        acquiredDate:document.getElementById('mc-date').value,
+        upgradeFlag:document.getElementById('mc-upgrade').checked
+      };
+      saveOwned();
+    }
+  }else if(oldKey&&oldKey!==ckey(entry)&&owned[oldKey]){
+    owned[ckey(entry)]=owned[oldKey];
+    delete owned[oldKey];
+    saveOwned();
+  }
+  saveCards();populateTrackerEraFilter();renderTracker();renderManage();
+  closeModal('modal-card');
+  toast(editingIdx!==null?'Card updated':'Card added ✓');
+}
+function deleteCard(){
+  if(editingIdx===null)return;
+  const k=ckey(cards[editingIdx]);
+  delete owned[k];
+  cards.splice(editingIdx,1);
+  saveCards();saveOwned();populateTrackerEraFilter();renderTracker();renderManage();
+  closeModal('modal-card');toast('Card deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+//  BULK ADD
+// ═══════════════════════════════════════════════════════
+function openBulkAdd(){
+  populateEraSelect('bulk-era','');
+  document.getElementById('bulk-text').value='';
+  document.getElementById('bulk-preview').textContent='';
+  setPri('bulk-pri-grp','');
+  openModal('modal-bulk');
+}
+document.getElementById('bulk-text').addEventListener('input',function(){
+  const lines=this.value.split('\n').filter(l=>l.trim());
+  document.getElementById('bulk-preview').textContent=lines.length?`${lines.length} card${lines.length!==1?'s':''} to add`:'';
+});
+function saveBulk(){
+  const era=document.getElementById('bulk-era').value;
+  const pri=getPri('bulk-pri-grp');
+  const lines=document.getElementById('bulk-text').value.split('\n').filter(l=>l.trim());
+  if(!era){toast('Select a set first');return;}
+  if(!lines.length){toast('No cards entered');return;}
+  let added=0,dupes=0;
+  lines.forEach(line=>{
+    const parts=line.split(',').map(p=>p.trim());
+    const name=parts[0];
+    const num=parts[1]||'—';
+    if(!name)return;
+    const isDupe=cards.some(r=>r[0]===era&&r[1].toLowerCase()===name.toLowerCase());
+    if(isDupe){dupes++;return;}
+    cards.push([era,name,num,pri,'','','']);
+    added++;
+  });
+  saveCards();populateTrackerEraFilter();renderTracker();renderManage();
+  closeModal('modal-bulk');
+  toast(`Added ${added} card${added!==1?'s':''}${dupes?' ('+dupes+' duplicates skipped)':''}`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ERA MODAL
+// ═══════════════════════════════════════════════════════
+function openAddEra(){
+  editingEra=null;
+  document.getElementById('me-title').textContent='Add Set';
+  document.getElementById('me-delete').style.display='none';
+  document.getElementById('me-name').value='';
+  openModal('modal-era');
+}
+function openEditEra(name){
+  editingEra=name;
+  document.getElementById('me-title').textContent='Rename Set';
+  document.getElementById('me-delete').style.display='block';
+  document.getElementById('me-name').value=name;
+  openModal('modal-era');
+}
+function saveEra(){
+  const name=document.getElementById('me-name').value.trim();
+  if(!name){toast('Set name required');return;}
+  if(editingEra)cards.forEach(r=>{if(r[0]===editingEra)r[0]=name;});
+  saveCards();populateTrackerEraFilter();renderTracker();renderManage();
+  closeModal('modal-era');toast(editingEra?'Set renamed':'Set created');
+}
+function deleteEra(){
+  if(!editingEra)return;
+  confirmAction(`Delete set "${editingEra}"?`,'All cards in this set will be permanently deleted.',()=>{
+    cards.filter(r=>r[0]===editingEra).forEach(r=>{delete owned[ckey(r)];});
+    cards=cards.filter(r=>r[0]!==editingEra);
+    saveCards();saveOwned();populateTrackerEraFilter();renderTracker();renderManage();
+    closeModal('modal-era');toast('Set deleted');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MANAGE PAGE
+// ═══════════════════════════════════════════════════════
+function renderManage(){
+  const eras=[...new Set(cards.map(r=>r[0]))];
+  document.getElementById('era-total-count').textContent=`(${eras.length} sets, ${cards.length} cards)`;
+  document.getElementById('era-manage-list').innerHTML=eras.map(e=>{
+    const cnt=cards.filter(r=>r[0]===e).length;
+    const ownedCnt=cards.filter(r=>r[0]===e&&isOwned(r)).length;
+    return`<li class="era-item">
+      <div class="ei-left">
+        <div class="ei-name">${e}</div>
+        <div class="ei-count">${ownedCnt}/${cnt} owned</div>
+      </div>
+      <div class="ei-btns">
+        <button class="ei-btn" onclick="openEditEra('${e.replace(/'/g,"\\'")}')">✏️</button>
+        <button class="ei-btn del" onclick="openEditEra('${e.replace(/'/g,"\\'")}');deleteEra()">🗑</button>
+      </div>
+    </li>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ERA FILTER POPULATOR
+// ═══════════════════════════════════════════════════════
+function populateTrackerEraFilter(){
+  const eras=[...new Set(cards.map(r=>r[0]))];
+  const sel=document.getElementById('t-era');
+  const val=sel.value;
+  sel.innerHTML='<option value="">All sets</option>'+eras.map(e=>`<option value="${e}"${e===val?' selected':''}>${e}</option>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  DANGER ZONE
+// ═══════════════════════════════════════════════════════
+function doResetOwned(){owned={};saveOwned();renderTracker();toast('Owned marks cleared');}
+function doResetLog(){shows=[];saveShows();renderLog();toast('Show log cleared');}
+function doResetAll(){
+  cards=JSON.parse(JSON.stringify(DEFAULT_CARDS));owned={};shows=[];
+  saveCards();saveOwned();saveShows();
+  populateTrackerEraFilter();renderTracker();renderManage();
+  toast('App reset to defaults');
+}
+
+// ═══════════════════════════════════════════════════════
+//  THEME TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleTheme(){
+  lightTheme=!lightTheme;
+  document.body.classList.toggle('light',lightTheme);
+  localStorage.setItem('pkv4_theme',lightTheme?'light':'dark');
+  updateThemeToggle();
+}
+function updateThemeToggle(){
+  const sw=document.getElementById('theme-sw');
+  sw.classList.toggle('on',lightTheme);
+}
+
+// ═══════════════════════════════════════════════════════
+//  BACKUP
+// ═══════════════════════════════════════════════════════
+function doExport(){
+  const data={cards,owned,shows,v:4};
+  try{
+    const str=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    navigator.clipboard.writeText(str).then(()=>toast('Backup copied!')).catch(()=>{
+      document.getElementById('import-box').value=str;
+      toast('Copied to import box — select & copy manually');
+    });
+  }catch(e){toast('Export failed — try in browser');}
+}
+function doImport(){
+  const raw=document.getElementById('import-box').value.trim();
+  if(!raw){toast('Paste a backup code first');return;}
+  try{
+    const data=JSON.parse(decodeURIComponent(escape(atob(raw))));
+    if(!data.cards||!Array.isArray(data.cards))throw new Error('bad data');
+    cards=data.cards.map(r=>{while(r.length<7)r.push('');return r;});
+    owned=data.owned||{};
+    shows=data.shows||[];
+    saveCards();saveOwned();saveShows();
+    populateTrackerEraFilter();renderTracker();
+    document.getElementById('import-box').value='';
+    toast('Imported successfully!');
+  }catch(e){toast('Invalid backup code');}
+}
+function copyWantList(){
+  const lines=cards.filter(r=>!isOwned(r)).map(r=>`[${r[0]}] ${r[1]} (${r[2]})${r[3]?' — '+r[3]:''}${r[5]?' 🎯$'+r[5]:''}`)
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Want list copied!')).catch(()=>toast('Copy failed'));
+}
+
+// ═══════════════════════════════════════════════════════
+//  CONFIRM MODAL
+// ═══════════════════════════════════════════════════════
+let _confCb=null;
+function confirmAction(title,msg,cb){
+  document.getElementById('conf-title').textContent=title;
+  document.getElementById('conf-msg').textContent=msg;
+  _confCb=cb;openModal('modal-confirm');
+}
+document.getElementById('conf-ok').onclick=function(){closeModal('modal-confirm');if(_confCb)_confCb();_confCb=null;};
+
+// ═══════════════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+document.querySelectorAll('.overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.add('hidden');});
+});
+// close lightbox on back swipe / escape
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLB();});
+
+// ═══════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════
+let _toastT;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(_toastT);_toastT=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+load();
+populateTrackerEraFilter();
+renderTracker();
+
+</script>
+</body>
+</html>
 
